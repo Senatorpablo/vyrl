@@ -75,6 +75,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="generator.js"></script>
 </head>
 <body>
   <!-- Loading Screen -->
@@ -86,6 +87,112 @@
         <text x="60" y="32" font-family="Geist, sans-serif" font-weight="700" font-size="36" fill="#C084FC">R</text>
         <text x="88" y="32" font-family="Geist, sans-serif" font-weight="600" font-size="36" fill="#06B6D4">L</text>
       </svg>
+    </div>
+  </div>
+
+  <!-- Generation Modal -->
+  <div class="gen-overlay" id="genOverlay">
+    <div class="gen-modal" id="genModal">
+      <!-- Step 1: Progress -->
+      <div class="gen-phase" id="genPhase1">
+        <div class="gen-spinner-lg"></div>
+        <h3 id="genStatus">Analysing your brand...</h3>
+        <div class="gen-progress">
+          <div class="gen-progress-bar" id="genProgressBar"></div>
+        </div>
+        <div class="gen-steps">
+          <div class="gen-step active" data-step="scrape">
+            <span class="gen-step-icon">🌐</span>
+            <span>Scanning website</span>
+          </div>
+          <div class="gen-step" data-step="analyze">
+            <span class="gen-step-icon">🧠</span>
+            <span>Analysing brand DNA</span>
+          </div>
+          <div class="gen-step" data-step="influencer">
+            <span class="gen-step-icon">✨</span>
+            <span>Generating influencer</span>
+          </div>
+          <div class="gen-step" data-step="videos">
+            <span class="gen-step-icon">🎬</span>
+            <span>Creating videos</span>
+          </div>
+        </div>
+        <p class="gen-hint">This takes about 10-15 seconds while we build your AI brand ambassador</p>
+      </div>
+
+      <!-- Step 2: Results -->
+      <div class="gen-phase" id="genPhase2" style="display:none">
+        <button class="gen-close" id="genClose">×</button>
+        <div class="gen-result-header">
+          <div class="gen-success-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            Influencer Generated
+          </div>
+          <h2 id="genBrandName">Your Brand</h2>
+        </div>
+
+        <!-- Influencer Card -->
+        <div class="gen-influencer-card" id="genInfCard">
+          <div class="gen-inf-avatar">
+            <div class="gen-avatar-img" id="genAvatarImg">
+              <span id="genInitials">V</span>
+            </div>
+            <div class="gen-avatar-ring"></div>
+          </div>
+          <div class="gen-inf-details">
+            <h3 id="genInfName">Maya, 24</h3>
+            <span class="gen-inf-style" id="genInfStyle">Beauty & Wellness</span>
+            <p class="gen-inf-bio" id="genInfBio">Your AI brand ambassador</p>
+            <div class="gen-voice-badge">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="14"><path d="M10 2a3 3 0 00-3 3v4a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M5 10a5 5 0 0010 0h-2a3 3 0 01-6 0H5z"/></svg>
+              <span id="genVoiceAccent">British — RP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brand analysis summary -->
+        <div class="gen-analysis" id="genAnalysis">
+          <div class="gen-analysis-item">
+            <strong>Industry</strong>
+            <span id="genIndustry">Beauty</span>
+          </div>
+          <div class="gen-analysis-item">
+            <strong>Brand Tone</strong>
+            <span id="genTones">Friendly, Bold</span>
+          </div>
+          <div class="gen-analysis-item">
+            <strong>Products</strong>
+            <span id="genProducts">Skincare, Serum</span>
+          </div>
+          <div class="gen-analysis-item">
+            <strong>Scraped From</strong>
+            <span id="genSource">Direct site analysis ✓</span>
+          </div>
+        </div>
+
+        <!-- Video Grid -->
+        <div class="gen-videos-section">
+          <h3>Generated Video Content</h3>
+          <div class="gen-videos-grid" id="genVideosGrid"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="gen-actions">
+          <button class="btn-primary btn-large" id="genStartAgain">Generate Another →</button>
+          <button class="btn-outline" onclick="document.getElementById('genOverlay').style.display='none'">Close</button>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div class="gen-phase" id="genPhaseErr" style="display:none">
+        <h3>⚠️ Couldn't reach your site</h3>
+        <p id="genErrMsg">Your site may block external access.</p>
+        <div class="gen-fallback-card">
+          <p>We built your influencer from your domain name instead. Results below:</p>
+        </div>
+        <button class="btn-primary" id="genShowFallback">Show My Influencer →</button>
+      </div>
     </div>
   </div>
 

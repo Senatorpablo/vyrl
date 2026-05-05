@@ -304,19 +304,212 @@
   // ── Footer Year ──
   document.getElementById('footerYear').textContent = new Date().getFullYear();
 
-  // ── Form Handlers ──
+  // ── Generation Engine Orchestration ──
+  const overlay = document.getElementById('genOverlay');
+  const modal = document.getElementById('genModal');
+  const phase1 = document.getElementById('genPhase1');
+  const phase2 = document.getElementById('genPhase2');
+  const phaseErr = document.getElementById('genPhaseErr');
+  const progressBar = document.getElementById('genProgressBar');
+  const genStatus = document.getElementById('genStatus');
+  let currentResult = null;
+  const genSteps = document.querySelectorAll('.gen-step');
+
+  function resetGenUI() {
+    phase1.style.display = 'block';
+    phase2.style.display = 'none';
+    phaseErr.style.display = 'none';
+    progressBar.style.width = '0%';
+    genStatus.textContent = 'Analysing your brand...';
+    genSteps.forEach(s => { s.classList.remove('active', 'done'); });
+    document.querySelector('[data-step="scrape"]').classList.add('active');
+  }
+
+  function showPhase2() {
+    phase1.style.display = 'none';
+    phaseErr.style.display = 'none';
+    phase2.style.display = 'block';
+  }
+
+  function showPhaseErr(msg) {
+    phase1.style.display = 'none';
+    phase2.style.display = 'none';
+    phaseErr.style.display = 'block';
+    document.getElementById('genErrMsg').textContent = msg || 'All proxies failed to reach the site.';
+  }
+
+  async function advanceStep(step, percent) {
+    const el = document.querySelector(`[data-step="${step}"]`);
+    if (el) {
+      el.classList.remove('active');
+      el.classList.add('done');
+    }
+    progressBar.style.width = `${percent}%`;
+
+    // Activate next step
+    const steps = ['scrape', 'analyze', 'influencer', 'videos'];
+    const idx = steps.indexOf(step);
+    if (idx < steps.length - 1) {
+      const nextEl = document.querySelector(`[data-step="${steps[idx + 1]}"]`);
+      if (nextEl) nextEl.classList.add('active');
+    }
+  }
+
+  function renderResults(result) {
+    currentResult = result;
+    const { brand, influencer, videos, colors } = result;
+
+    // Brand name
+    document.getElementById('genBrandName').textContent = brand.brandName;
+
+    // Influencer card
+    const avatarImg = document.getElementById('genAvatarImg');
+    avatarImg.style.background = `linear-gradient(135deg, ${colors.primary}, ${colors.accent})`;
+    document.getElementById('genInitials').textContent = influencer.name[0];
+    document.getElementById('genInfName').textContent = `${influencer.name}, ${influencer.age}`;
+    document.getElementById('genInfStyle').textContent = `${influencer.style} — ${influencer.voice.region}`;
+    document.getElementById('genInfBio').textContent = influencer.vibe;
+    document.getElementById('genVoiceAccent').textContent = `${influencer.voice.name} — ${influencer.voice.style}`;
+
+    // Brand analysis
+    document.getElementById('genIndustry').textContent = brand.industry.charAt(0).toUpperCase() + brand.industry.slice(1);
+    document.getElementById('genTones').textContent = brand.tones.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(', ');
+    document.getElementById('genProducts').textContent = brand.products.slice(0, 3).join(', ');
+    document.getElementById('genSource').textContent = brand.scraperWorked ? 'Direct site analysis ✓' : 'Domain-based inference';
+
+    // Video grid
+    const grid = document.getElementById('genVideosGrid');
+    grid.innerHTML = '';
+    videos.forEach(v => {
+      grid.innerHTML += `
+        <div class="gen-video-card">
+          <div class="vid-header">
+            <span class="vid-format">${v.format}</span>
+            <span class="vid-platform">${v.platform}</span>
+          </div>
+          <div class="vid-script">${v.caption}</div>
+          <div class="vid-stats">
+            <span>👁 ${v.stats.views >= 1000 ? (v.stats.views/1000).toFixed(1)+'K' : v.stats.views}</span>
+            <span>❤ ${v.stats.likes >= 1000 ? (v.stats.likes/1000).toFixed(1)+'K' : v.stats.likes}</span>
+            <span>💬 ${v.stats.comments}</span>
+          </div>
+        </div>`;
+    });
+
+    showPhase2();
+  }
+
+  async function runGeneration(url) {
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    resetGenUI();
+
+    try {
+      // Step 1: Scrape
+      genStatus.textContent = 'Scanning your website...';
+      await sleep(300);
+      advanceStep('scrape', 20);
+
+      // Step 2: Analyze
+      await sleep(400);
+      genStatus.textContent = 'Analysing brand DNA...';
+      advanceStep('analyze', 45);
+
+      // Step 3: Generate influencer
+      await sleep(500);
+      genStatus.textContent = 'Generating your AI influencer...';
+      advanceStep('influencer', 70);
+
+      // Step 4: Create videos
+      await sleep(600);
+      genStatus.textContent = 'Creating video content...';
+      advanceStep('videos', 90);
+
+      // Run actual generation
+      const result = await VYRL.generate(url);
+
+      // If scraper failed, we still render (domain fallback)
+      if (!result.brand.scraperWorked) {
+        showPhaseErr('Could not reach your site directly. We generated your influencer from domain analysis instead.');
+        document.getElementById('genShowFallback').onclick = () => {
+          phaseErr.style.display = 'none';
+          genStatus.textContent = 'Complete!';
+          progressBar.style.width = '100%';
+          renderResults(result);
+        };
+        return;
+      }
+
+      genStatus.textContent = 'Complete!';
+      advanceStep('videos', 100);
+
+      await sleep(400);
+      renderResults(result);
+
+    } catch (err) {
+      console.error('Generation failed:', err);
+      showPhaseErr(`Error: ${err.message || 'Something went wrong'}`);
+      document.getElementById('genShowFallback').onclick = () => {
+        phaseErr.style.display = 'none';
+        // Emergency fallback — generate from domain name only
+        VYRL.generate(url).then(r => renderResults(r));
+      };
+    }
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // Close modal
+  document.getElementById('genClose').addEventListener('click', () => {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // Start Again button
+  document.getElementById('genStartAgain').addEventListener('click', () => {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    const heroInput = document.getElementById('heroUrl');
+    heroInput.focus();
+  });
+
+  // ── Form Handlers (wired to real generation) ──
   window.handleHeroSubmit = function(e) {
     e.preventDefault();
-    const url = document.getElementById('heroUrl').value;
-    showToast(`✓ Scanning ${url || 'your website'}... We'll generate your influencer shortly.`);
-    document.getElementById('heroUrl').value = '';
+    const input = document.getElementById('heroUrl');
+    const url = input.value.trim();
+    if (!url) {
+      showToast('⚠️ Please enter a website URL');
+      return;
+    }
+    input.value = '';
+    runGeneration(url);
   };
 
   window.handleCTASubmit = function(e) {
     e.preventDefault();
-    const url = document.getElementById('ctaUrl').value;
-    showToast(`✓ ${url || 'Success'}! Your AI influencer is being generated. Check your email.`);
-    document.getElementById('ctaUrl').value = '';
+    const input = document.getElementById('ctaUrl');
+    const url = input.value.trim();
+    if (!url) {
+      showToast('⚠️ Please enter a website URL');
+      return;
+    }
+    input.value = '';
+    runGeneration(url);
   };
 
   // ── Toast ──
