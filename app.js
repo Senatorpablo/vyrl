@@ -347,7 +347,7 @@
     progressBar.style.width = `${percent}%`;
 
     // Activate next step
-    const steps = ['scrape', 'analyze', 'influencer', 'videos'];
+    const steps = ['scrape', 'analyze', 'influencer', 'videos', 'render'];
     const idx = steps.indexOf(step);
     if (idx < steps.length - 1) {
       const nextEl = document.querySelector(`[data-step="${steps[idx + 1]}"]`);
@@ -377,17 +377,33 @@
     document.getElementById('genProducts').textContent = brand.products.slice(0, 3).join(', ');
     document.getElementById('genSource').textContent = brand.scraperWorked ? 'Direct site analysis ✓' : 'Domain-based inference';
 
-    // Video grid
+    // Video grid — show actual rendered videos
     const grid = document.getElementById('genVideosGrid');
     grid.innerHTML = '';
     videos.forEach(v => {
+      const hasVideo = v.url && !v.error;
       grid.innerHTML += `
         <div class="gen-video-card">
           <div class="vid-header">
             <span class="vid-format">${v.format}</span>
             <span class="vid-platform">${v.platform}</span>
           </div>
-          <div class="vid-script">${v.caption}</div>
+          ${hasVideo ? `
+            <div class="vid-player">
+              <video 
+                src="${v.url}" 
+                poster="${v.poster || ''}" 
+                controls 
+                playsinline 
+                preload="metadata"
+                class="vid-video"
+                width="720" 
+                height="1280"
+              ></video>
+            </div>
+          ` : `
+            <div class="vid-script">${v.caption}</div>
+          `}
           <div class="vid-stats">
             <span>👁 ${v.stats.views >= 1000 ? (v.stats.views/1000).toFixed(1)+'K' : v.stats.views}</span>
             <span>❤ ${v.stats.likes >= 1000 ? (v.stats.likes/1000).toFixed(1)+'K' : v.stats.likes}</span>
@@ -423,9 +439,9 @@
       // Step 4: Create videos
       await sleep(600);
       genStatus.textContent = 'Creating video content...';
-      advanceStep('videos', 90);
+      advanceStep('videos', 75);
 
-      // Run actual generation
+      // Run actual generation (brand analysis + scripts)
       const result = await VYRL.generate(url);
 
       // If scraper failed, we still render (domain fallback)
@@ -440,10 +456,33 @@
         return;
       }
 
-      genStatus.textContent = 'Complete!';
-      advanceStep('videos', 100);
+      // Step 5: Render actual videos
+      genStatus.textContent = 'Rendering video files...';
+      advanceStep('render', 85);
 
-      await sleep(400);
+      const videoDatas = result.videos.map(v => ({
+        ...v,
+        brandName: result.brand.brandName,
+        brandHandle: result.brand.brandName.toLowerCase().replace(/\s+/g, ''),
+        caption: v.caption,
+        platform: v.platform,
+      }));
+
+      const renderedVideos = await VYRLRenderer.renderBatch(
+        result.influencer,
+        videoDatas,
+        (done, total, msg) => {
+          genStatus.textContent = msg;
+          progressBar.style.width = `${85 + (done / total) * 12}%`;
+        }
+      );
+
+      result.videos = renderedVideos;
+
+      genStatus.textContent = 'Complete!';
+      advanceStep('render', 100);
+
+      await sleep(300);
       renderResults(result);
 
     } catch (err) {

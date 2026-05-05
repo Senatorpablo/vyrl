@@ -1576,6 +1576,20 @@ body {
   background: var(--bg-card);
   border-radius: 100px;
 }
+.vid-player {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 10px;
+  aspect-ratio: 9/16;
+  background: #000;
+  position: relative;
+}
+.vid-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
 .gen-video-card .vid-script {
   font-size: 0.8rem;
   color: var(--text-secondary);
