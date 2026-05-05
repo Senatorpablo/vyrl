@@ -8,7 +8,7 @@ export const Root: React.FC = () => {
       <Composition
         id="ugc-video"
         component={UGCVideo}
-        durationInFrames={192} // 8 seconds at 24fps
+        durationInFrames={192}
         fps={24}
         width={720}
         height={1280}
@@ -27,6 +27,8 @@ export const Root: React.FC = () => {
           caption: "This serum literally changed my skin in 48 hours. Not even joking. @glowlab",
           format: "Honest Review",
           platform: "TikTok",
+          faceUrl: "https://randomuser.me/api/portraits/women/0.jpg",
+          backgroundUrl: "https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?w=720&q=80",
           palette: {
             bg: "#1a0525",
             accent: "#7C3AED",

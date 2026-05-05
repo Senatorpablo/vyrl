@@ -1,11 +1,9 @@
 import React from "react";
-import { useCurrentFrame, useVideoConfig, interpolate, AbsoluteFill, spring } from "remotion";
-import { Background } from "./components/Background";
-import { Avatar } from "./components/Avatar";
+import { useCurrentFrame, useVideoConfig, AbsoluteFill, spring } from "remotion";
+import { TikTokAvatar } from "./components/TikTokAvatar";
 import { Caption } from "./components/Caption";
 import { BrandTag } from "./components/BrandTag";
-import { VideoUI } from "./components/VideoUI";
-import { GlowOverlay } from "./components/GlowOverlay";
+import { TikTokUI } from "./components/TikTokUI";
 
 interface VideoProps {
   brandName: string;
@@ -22,6 +20,8 @@ interface VideoProps {
   caption: string;
   format: string;
   platform: string;
+  faceUrl: string;
+  backgroundUrl: string;
   palette: {
     bg: string;
     accent: string;
@@ -39,23 +39,35 @@ export const UGCVideo: React.FC<VideoProps> = (props) => {
   const totalFrames = fps * TOTAL_DURATION_SEC;
   const progress = frame / totalFrames;
 
-  // Entrance spring
-  const entrance = spring({
-    frame,
-    fps,
-    config: { damping: 15, stiffness: 80 },
-    from: 0.9,
-    to: 1,
-  });
-
   return (
-    <AbsoluteFill style={{ backgroundColor: props.palette.bg }}>
-      <Background palette={props.palette} progress={progress} />
-      <GlowOverlay palette={props.palette} progress={progress} />
-      <Avatar palette={props.palette} influencer={props} progress={progress} frame={frame} fps={fps} />
-      <Caption palette={props.palette} caption={props.caption} progress={progress} fps={fps} />
-      <BrandTag palette={props.palette} brandHandle={props.brandHandle} progress={progress} />
-      <VideoUI palette={props.palette} platform={props.platform} progress={progress} />
+    <AbsoluteFill style={{ backgroundColor: "#000" }}>
+      <TikTokAvatar
+        faceUrl={props.faceUrl}
+        backgroundUrl={props.backgroundUrl}
+        influencerName={props.influencerName}
+        influencerAge={props.influencerAge}
+        influencerStyle={props.influencerStyle}
+        palette={props.palette}
+        progress={progress}
+      />
+      <Caption
+        palette={props.palette}
+        caption={props.caption}
+        progress={progress}
+        fps={fps}
+      />
+      <BrandTag
+        palette={props.palette}
+        brandHandle={props.brandHandle}
+        progress={progress}
+      />
+      <TikTokUI
+        palette={props.palette}
+        platform={props.platform}
+        progress={progress}
+        influencerName={props.influencerName}
+        voiceAccent={props.voiceAccent}
+      />
     </AbsoluteFill>
   );
 };

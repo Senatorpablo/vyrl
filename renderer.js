@@ -1,245 +1,287 @@
 /* ═══════════════════════════════════════════
-   VYRL — renderer.js
-   Client-side Canvas video renderer
-   Renders real TikTok-style UGC videos in-browser
-   using Canvas + MediaRecorder → WebM
+   VYRL — renderer.js (rebuilt with real faces)
+   Client-side Canvas + MediaRecorder video renderer
+   Composites real portrait images + lifestyle backgrounds
+   Full TikTok UGC look
    ═══════════════════════════════════════════ */
 
 const VYRLRenderer = (() => {
   'use strict';
 
-  // 9:16 TikTok/Reels/Shorts aspect ratio
   const WIDTH = 720;
   const HEIGHT = 1280;
   const FPS = 24;
-  const DURATION_SEC = 8; // 8-second reels
+  const DURATION_SEC = 8;
 
-  // ── Color palettes ──
-  const PALETTES = [
-    { bg: '#1a0525', accent: '#7C3AED', text: '#F4F4F5', glow: 'rgba(124,58,237,0.3)' },
-    { bg: '#0a1628', accent: '#06B6D4', text: '#F4F4F5', glow: 'rgba(6,182,212,0.3)' },
-    { bg: '#1a0a2e', accent: '#EC4899', text: '#F4F4F5', glow: 'rgba(236,72,153,0.3)' },
-    { bg: '#0f1a0a', accent: '#22C55E', text: '#F4F4F5', glow: 'rgba(34,197,94,0.3)' },
-    { bg: '#1a1505', accent: '#F59E0B', text: '#F4F4F5', glow: 'rgba(245,158,11,0.3)' },
-    { bg: '#0a0a20', accent: '#8B5CF6', text: '#F4F4F5', glow: 'rgba(139,92,246,0.3)' },
-    { bg: '#200a0a', accent: '#EF4444', text: '#F4F4F5', glow: 'rgba(239,68,68,0.3)' },
-    { bg: '#0a1a1a', accent: '#14B8A6', text: '#F4F4F5', glow: 'rgba(20,184,166,0.3)' },
-  ];
+  // ── Image cache ──
+  const imageCache = new Map();
 
-  function pickPalette(idx) {
-    return PALETTES[idx % PALETTES.length];
+  async function loadImage(url) {
+    if (imageCache.has(url)) return imageCache.get(url);
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => { imageCache.set(url, img); resolve(img); };
+      img.onerror = () => {
+        // Return null silently — we'll draw fallback
+        imageCache.set(url, null);
+        resolve(null);
+      };
+      img.src = url;
+    });
   }
 
-  // ── Draw gradient background ──
-  function drawBackground(ctx, palette, frame, totalFrames) {
-    const progress = frame / totalFrames;
+  // ── Draw TikTok-style video ──
+  function drawBackground(ctx, bgImg, progress) {
+    // Ken Burns effect
+    const scale = 1 + progress * 0.08;
+    const shiftX = Math.sin(progress * 0.7) * 15;
+    const shiftY = Math.cos(progress * 0.5) * 10;
 
-    // Animated radial gradient
-    const cx = WIDTH / 2 + Math.sin(progress * Math.PI * 2) * 80;
-    const cy = HEIGHT / 2 + Math.cos(progress * Math.PI * 2.3) * 120;
-
-    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, WIDTH);
-    grad.addColorStop(0, palette.accent + '15');
-    grad.addColorStop(0.4, palette.bg);
-    grad.addColorStop(1, '#000000');
-
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-
-    // Floating particles (subtle)
-    for (let i = 0; i < 12; i++) {
-      const px = (WIDTH * 0.3 + Math.sin(progress * 3 + i * 1.7) * WIDTH * 0.35 + i * 30) % WIDTH;
-      const py = (HEIGHT * 0.3 + Math.cos(progress * 2.5 + i * 1.3) * HEIGHT * 0.35 + i * 20) % HEIGHT;
-      const alpha = 0.03 + Math.sin(progress * 4 + i) * 0.02;
-      ctx.fillStyle = palette.accent + Math.floor(alpha * 255).toString(16).padStart(2, '0');
-      ctx.beginPath();
-      ctx.arc(px, py, 2 + i * 0.3, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  // ── Draw influencer avatar circle ──
-  function drawAvatar(ctx, palette, influencer, frame, totalFrames) {
-    const progress = frame / totalFrames;
-    const cx = WIDTH / 2;
-    const cy = HEIGHT * 0.27;
-    const radius = 90;
-
-    // Pulsing glow ring
-    const pulseScale = 1 + Math.sin(progress * Math.PI * 2 * 0.8) * 0.08;
     ctx.save();
-    ctx.shadowColor = palette.glow;
-    ctx.shadowBlur = 40 + Math.sin(progress * 4) * 10;
+    ctx.translate(WIDTH / 2, HEIGHT / 2);
+    ctx.scale(scale, scale);
+    ctx.translate(-WIDTH / 2 + shiftX, -HEIGHT / 2 + shiftY);
 
-    // Outer ring
-    ctx.strokeStyle = palette.accent;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius * pulseScale + 8, 0, Math.PI * 2);
-    ctx.stroke();
+    if (bgImg) {
+      // Scale to fill
+      const imgRatio = bgImg.width / bgImg.height;
+      const canvasRatio = WIDTH / HEIGHT;
+      let sw, sh, sx, sy;
+      if (imgRatio > canvasRatio) {
+        sh = bgImg.height;
+        sw = sh * canvasRatio;
+        sx = (bgImg.width - sw) / 2;
+        sy = 0;
+      } else {
+        sw = bgImg.width;
+        sh = sw / canvasRatio;
+        sx = 0;
+        sy = (bgImg.height - sh) / 2;
+      }
+      ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, WIDTH, HEIGHT);
+    } else {
+      // Fallback gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+      grad.addColorStop(0, '#1a0525');
+      grad.addColorStop(1, '#0a0a0b');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    }
     ctx.restore();
 
-    // Avatar circle with gradient
-    const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
-    grad.addColorStop(0, palette.accent);
-    grad.addColorStop(1, palette.accent + '80');
-    ctx.fillStyle = grad;
+    // Dark overlays for readability
+    const overlayGrad = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+    overlayGrad.addColorStop(0, 'rgba(0,0,0,0.35)');
+    overlayGrad.addColorStop(0.4, 'rgba(0,0,0,0.05)');
+    overlayGrad.addColorStop(0.8, 'rgba(0,0,0,0.5)');
+    overlayGrad.addColorStop(1, 'rgba(0,0,0,0.7)');
+    ctx.fillStyle = overlayGrad;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    // Vignette
+    const vignetteGrad = ctx.createRadialGradient(WIDTH / 2, HEIGHT / 2, WIDTH * 0.35, WIDTH / 2, HEIGHT / 2, WIDTH * 0.7);
+    vignetteGrad.addColorStop(0, 'transparent');
+    vignetteGrad.addColorStop(1, 'rgba(0,0,0,0.5)');
+    ctx.fillStyle = vignetteGrad;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  }
+
+  function drawFaceCircle(ctx, faceImg, palette, progress) {
+    const cx = WIDTH / 2;
+    const cy = HEIGHT * 0.24;
+    const radius = 140;
+
+    // Subtle float + tilt
+    const floatY = Math.sin(progress * Math.PI * 2.5) * 4;
+    const tilt = Math.sin(progress * Math.PI * 3.1) * 0.03;
+
+    ctx.save();
+    ctx.translate(cx, cy + floatY);
+    ctx.rotate(tilt);
+
+    // Glow ring
     ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.arc(0, 4, radius + 6, 0, Math.PI * 2);
+    ctx.strokeStyle = palette.accent + '30';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = palette.accent;
+    ctx.shadowBlur = 30;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Clip to circle
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.clip();
+
+    // Draw face or fallback
+    if (faceImg) {
+      const size = radius * 2;
+      ctx.drawImage(faceImg, -radius, -radius * 0.15, size, size * 1.15);
+    } else {
+      // Gradient fallback
+      const grad = ctx.createLinearGradient(-radius, -radius, radius, radius);
+      grad.addColorStop(0, palette.accent);
+      grad.addColorStop(1, palette.accent + '40');
+      ctx.fillStyle = grad;
+      ctx.fillRect(-radius, -radius, radius * 2, radius * 2);
+      // Initial
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${radius}px "Geist", "Inter", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('?', 0, 10);
+    }
+
+    // Inner glow overlay
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${parseHexRgb(palette.accent)},0.08)`;
     ctx.fill();
 
-    // Initial
+    ctx.restore();
+  }
+
+  function drawTikTokSidebar(ctx, palette, influencerName, sideX) {
+    const cx = WIDTH - 36 - sideX;
+    const startY = HEIGHT * 0.68;
+
+    // Profile mini
+    ctx.beginPath();
+    ctx.arc(cx, startY, 22, 0, Math.PI * 2);
+    ctx.strokeStyle = palette.accent;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = palette.accent + '50';
+    ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.font = `bold ${radius}px "Geist", "Inter", sans-serif`;
+    ctx.font = 'bold 14px "Geist", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(influencer.name.charAt(0).toUpperCase(), cx, cy + 4);
+    ctx.fillText(influencerName.charAt(0), cx, startY);
 
-    // Small sparkle effects around avatar
-    for (let i = 0; i < 4; i++) {
-      const angle = progress * 2 + (i * Math.PI) / 2;
-      const sx = cx + Math.cos(angle) * (radius + 20);
-      const sy = cy + Math.sin(angle) * (radius + 20);
-      const sparkAlpha = 0.3 + Math.sin(progress * 6 + i) * 0.2;
-
-      ctx.fillStyle = palette.accent + Math.floor(sparkAlpha * 255).toString(16).padStart(2, '0');
+    // Action buttons
+    const buttons = ['♥', '💬', '↗', '☆'];
+    let by = startY + 50;
+    ctx.font = '22px sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    buttons.forEach(btn => {
       ctx.beginPath();
-      // Tiny star shape
-      drawSparkle(ctx, sx, sy, 6);
+      ctx.arc(cx, by, 22, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
       ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillText(btn, cx, by);
+      by += 48;
+    });
+  }
+
+  function drawBrandCaption(ctx, palette, caption, progress) {
+    const revealProgress = Math.min(progress * 2.4, 1);
+    const words = caption.split(' ');
+    let charCount = 0;
+    let wordIdx = 0;
+    for (let i = 0; i < words.length; i++) {
+      charCount += words[i].length + 1;
+      if (charCount > caption.length * revealProgress) { wordIdx = i; break; }
+      wordIdx = i + 1;
     }
-  }
+    const visibleWords = words.slice(0, wordIdx);
 
-  function drawSparkle(ctx, x, y, size) {
-    ctx.moveTo(x, y - size);
-    ctx.lineTo(x + size * 0.3, y - size * 0.3);
-    ctx.lineTo(x + size, y);
-    ctx.lineTo(x + size * 0.3, y + size * 0.3);
-    ctx.lineTo(x, y + size);
-    ctx.lineTo(x - size * 0.3, y + size * 0.3);
-    ctx.lineTo(x - size, y);
-    ctx.lineTo(x - size * 0.3, y - size * 0.3);
-    ctx.closePath();
-  }
-
-  // ── Typewriter text renderer ──
-  function drawCaption(ctx, palette, videoData, frame, totalFrames) {
-    const text = videoData.caption;
-    const revealProgress = Math.min((frame / totalFrames) * 2.2, 1); // full text by ~45% of video
-    const charCount = Math.floor(text.length * easeOutCubic(revealProgress));
-
-    const displayed = text.slice(0, charCount);
-
-    // Handle text wrapping
-    const maxWidth = WIDTH - 100;
+    // Wrap text
+    const maxWidth = WIDTH - 80;
     const fontSize = 38;
-    ctx.font = `600 ${fontSize}px/1.35 "Geist", "Inter", sans-serif`;
+    ctx.font = `700 ${fontSize}px/1.3 "Geist", "Inter", sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
 
-    const words = displayed.split(' ');
     const lines = [];
-    let currentLine = '';
-
-    for (const word of words) {
-      const testLine = currentLine ? currentLine + ' ' + word : word;
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxWidth && currentLine) {
-        lines.push(currentLine);
-        currentLine = word;
+    let current = '';
+    for (const w of visibleWords) {
+      const test = current ? current + ' ' + w : w;
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current);
+        current = w;
       } else {
-        currentLine = testLine;
+        current = test;
       }
     }
-    if (currentLine) lines.push(currentLine);
+    if (current) lines.push(current);
 
-    // Draw text with glow
-    const startY = HEIGHT * 0.46;
+    // Draw
+    const startY = HEIGHT * 0.72;
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,0.6)';
-    ctx.shadowBlur = 15;
-
+    ctx.shadowBlur = 12;
     lines.forEach((line, i) => {
-      const y = startY + i * (fontSize * 1.35);
-      // Slight fade-in for the last line being typed
-      const lineAlpha = i === lines.length - 1 && charCount < text.length ? 0.7 : 1;
-      ctx.fillStyle = palette.text + Math.floor(lineAlpha * 255).toString(16).padStart(2, '0');
-      ctx.fillText(line, WIDTH / 2, y);
+      ctx.fillStyle = '#F4F4F5';
+      ctx.fillText(line, WIDTH / 2, startY + i * (fontSize * 1.35));
     });
-
     ctx.restore();
   }
 
-  // ── Draw brand tag ──
-  function drawBrandTag(ctx, palette, videoData, frame, totalFrames) {
-    const progress = frame / totalFrames;
-    // Slide up from bottom at 40% of video
-    const slideProgress = Math.max(0, Math.min((progress - 0.35) * 2.5, 1));
-    const y = HEIGHT * 0.82 + (1 - slideProgress) * 60;
-
-    // Brand mention pill
-    const brandText = `@${videoData.brandHandle || videoData.brandName.toLowerCase().replace(/\s+/g, '')}`;
+  function drawBrandPill(ctx, palette, brandHandle, progress) {
+    const slideProgress = Math.max(0, Math.min((progress - 0.35) * 3, 1));
+    const text = `@${brandHandle}`;
     ctx.font = '600 28px "Geist", "Inter", sans-serif';
-    const textWidth = ctx.measureText(brandText).width;
-    const pillW = textWidth + 48;
-    const pillH = 44;
-    const pillX = WIDTH / 2 - pillW / 2;
-    const pillY = y - pillH / 2;
+    const tw = ctx.measureText(text).width;
+    const pw = tw + 48, ph = 44;
+    const px = (WIDTH - pw) / 2;
+    const py = HEIGHT * 0.88 - (1 - slideProgress) * 50;
 
-    // Pill background
-    ctx.fillStyle = palette.accent + '30';
-    ctx.strokeStyle = palette.accent + '50';
-    ctx.lineWidth = 1.5;
-    roundRect(ctx, pillX, pillY, pillW, pillH, 22);
+    ctx.globalAlpha = slideProgress;
+    // Pill bg
+    ctx.beginPath();
+    roundRectPath(ctx, px, py, pw, ph, 22);
+    ctx.fillStyle = palette.accent + '18';
     ctx.fill();
+    ctx.strokeStyle = palette.accent + '35';
+    ctx.lineWidth = 1.5;
     ctx.stroke();
-
-    // Brand text
+    // Text
     ctx.fillStyle = palette.accent;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(brandText, WIDTH / 2, y);
+    ctx.fillText(text, WIDTH / 2, py + ph / 2);
+    ctx.globalAlpha = 1;
   }
 
-  // ── Draw platform indicator and VYRL watermark ──
-  function drawUI(ctx, palette, videoData, frame, totalFrames) {
-    // Platform label top-right
-    ctx.font = '600 22px "Geist", "Inter", sans-serif';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-    ctx.fillText(videoData.platform || 'TikTok', WIDTH - 40, 36);
-
-    // VYRL watermark bottom-right (subtle)
-    ctx.font = '500 20px "Geist", "Inter", sans-serif';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'bottom';
-    ctx.fillStyle = 'rgba(255,255,255,0.12)';
-    ctx.fillText('VYRL', WIDTH - 40, HEIGHT - 36);
-
-    // Sound indicator (TikTok style) bottom-left
+  function drawTikTokBottomUI(ctx, palette, progress, platform, influencerName, voiceAccent) {
+    // Handle + voice label
+    ctx.font = '700 16px "Geist", "Inter", sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillStyle = 'rgba(255,255,255,0.2)';
-    ctx.font = '500 18px "Geist", "Inter", sans-serif';
-    ctx.fillText('🔊 Original Audio', 40, HEIGHT - 36);
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = '#fff';
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(`@${influencerName.toLowerCase()} • ${voiceAccent}`, 20, HEIGHT - 65);
+    ctx.shadowBlur = 0;
 
-    // Progress bar (thin) at very bottom
-    const barY = HEIGHT - 8;
-    const barW = WIDTH - 80;
-    const barX = 40;
-    const barProgress = frame / totalFrames;
+    // Platform
+    ctx.font = '600 13px "Geist", sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.fillText(platform, WIDTH - 20, 40);
 
+    // VYRL watermark
+    ctx.font = '600 12px "Geist", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.fillText('VYRL', WIDTH - 20, HEIGHT - 18);
+
+    // Progress bar
+    const barY = HEIGHT - 10;
+    ctx.beginPath();
+    roundRectPath(ctx, 16, barY, WIDTH - 32, 4, 2);
     ctx.fillStyle = 'rgba(255,255,255,0.08)';
-    roundRect(ctx, barX, barY, barW, 4, 2);
     ctx.fill();
-
+    ctx.beginPath();
+    roundRectPath(ctx, 16, barY, (WIDTH - 32) * progress, 4, 2);
     ctx.fillStyle = palette.accent + '60';
-    roundRect(ctx, barX, barY, barW * barProgress, 4, 2);
     ctx.fill();
   }
 
-  function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
+  function roundRectPath(ctx, x, y, w, h, r) {
     ctx.moveTo(x + r, y);
     ctx.lineTo(x + w - r, y);
     ctx.quadraticCurveTo(x + w, y, x + w, y + r);
@@ -252,76 +294,76 @@ const VYRLRenderer = (() => {
     ctx.closePath();
   }
 
-  function easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
+  function parseHexRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r},${g},${b}`;
   }
 
-  // ── Render a single frame ──
-  function renderFrame(ctx, palette, influencer, videoData, frame, totalFrames) {
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-
-    drawBackground(ctx, palette, frame, totalFrames);
-    drawAvatar(ctx, palette, influencer, frame, totalFrames);
-    drawCaption(ctx, palette, videoData, frame, totalFrames);
-    drawBrandTag(ctx, palette, videoData, frame, totalFrames);
-    drawUI(ctx, palette, videoData, frame, totalFrames);
-  }
-
-  // ── Render video and get Blob ──
+  // ── Main render ──
   async function renderVideo(influencer, videoData, paletteIdx = 0) {
-    const palette = pickPalette(paletteIdx);
-    const totalFrames = Math.ceil(DURATION_SEC * FPS);
-    const frameDuration = 1000 / FPS;
+    const palette = {
+      accent: ['#EC4899', '#06B6D4', '#7C3AED', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6', '#14B8A6'][paletteIdx % 8],
+    };
 
-    // Create offscreen canvas
+    // Load images
+    const faceUrl = videoData.faceUrl || VYRLFaces.getRandomFace(videoData.industry || 'beauty', influencer.gender || 'female');
+    const bgUrl = videoData.backgroundUrl || VYRLFaces.getRandomBackground();
+
+    const [faceImg, bgImg] = await Promise.all([
+      loadImage(faceUrl),
+      loadImage(bgUrl),
+    ]);
+
+    const totalFrames = Math.ceil(DURATION_SEC * FPS);
     const canvas = document.createElement('canvas');
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
     const ctx = canvas.getContext('2d');
 
-    // Set up MediaRecorder
     const stream = canvas.captureStream(FPS);
-    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-      ? 'video/webm;codecs=vp9'
-      : 'video/webm;codecs=vp8';
-
+    const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm;codecs=vp8';
     const chunks = [];
-    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 2500000 });
+    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 3000000 });
 
-    const recordingDone = new Promise((resolve) => {
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunks.push(e.data);
-      };
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        resolve(blob);
-      };
+    const recordingDone = new Promise(resolve => {
+      recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      recorder.onstop = () => resolve(new Blob(chunks, { type: 'video/webm' }));
     });
 
     recorder.start();
-
-    // Render frames with precise timing
     const startTime = performance.now();
+    const frameDuration = 1000 / FPS;
 
     for (let frame = 0; frame < totalFrames; frame++) {
       const targetTime = startTime + frame * frameDuration;
       const now = performance.now();
+      if (now < targetTime) await sleep(targetTime - now);
 
-      if (now < targetTime) {
-        await sleep(targetTime - now);
-      }
+      const progress = frame / totalFrames;
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-      renderFrame(ctx, palette, influencer, videoData, frame, totalFrames);
+      drawBackground(ctx, bgImg, progress);
+      drawFaceCircle(ctx, faceImg, palette, progress);
+      drawTikTokSidebar(ctx, palette, influencer.name, 0);
+      drawBrandCaption(ctx, palette, videoData.caption, progress);
+      drawBrandPill(ctx, palette, videoData.brandHandle || videoData.brandName?.toLowerCase(), progress);
+      drawTikTokBottomUI(ctx, palette, progress, videoData.platform, influencer.name, influencer.voice?.name || 'RP');
     }
 
-    // Small delay to capture last frame
     await sleep(100);
     recorder.stop();
-
     const blob = await recordingDone;
 
-    // Also create a poster thumbnail
-    renderFrame(ctx, palette, influencer, videoData, 0, totalFrames);
+    // Poster
+    ctx.clearRect(0, 0, WIDTH, HEIGHT);
+    drawBackground(ctx, bgImg, 0);
+    drawFaceCircle(ctx, faceImg, palette, 0);
+    drawTikTokSidebar(ctx, palette, influencer.name, 0);
+    drawBrandCaption(ctx, palette, videoData.caption, 0.05);
+    drawBrandPill(ctx, palette, videoData.brandHandle || videoData.brandName?.toLowerCase(), 0);
+    drawTikTokBottomUI(ctx, palette, 0, videoData.platform, influencer.name, influencer.voice?.name || 'RP');
     const poster = canvas.toDataURL('image/jpeg', 0.85);
 
     return {
@@ -334,45 +376,22 @@ const VYRLRenderer = (() => {
     };
   }
 
-  function sleep(ms) {
-    return new Promise((r) => setTimeout(r, ms));
-  }
-
-  // ── Batch render multiple videos ──
   async function renderBatch(influencer, videoDatas, onProgress) {
     const results = [];
-
     for (let i = 0; i < videoDatas.length; i++) {
-      if (onProgress) {
-        onProgress(i, videoDatas.length, `Rendering video ${i + 1}/${videoDatas.length}...`);
-      }
-
+      onProgress?.(i, videoDatas.length, `Rendering video ${i + 1}/${videoDatas.length}...`);
       try {
         const result = await renderVideo(influencer, videoDatas[i], i);
-        results.push({
-          ...videoDatas[i],
-          ...result,
-        });
+        results.push({ ...videoDatas[i], ...result });
       } catch (err) {
-        console.error(`Failed to render video ${i + 1}:`, err);
-        results.push({
-          ...videoDatas[i],
-          error: err.message,
-        });
+        console.error(`Render failed for video ${i}:`, err);
+        results.push({ ...videoDatas[i], error: err.message });
       }
     }
-
     return results;
   }
 
-  // ── Public API ──
-  return {
-    renderVideo,
-    renderBatch,
-    WIDTH,
-    HEIGHT,
-    DURATION_SEC,
-    FPS,
-    PALETTES,
-  };
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  return { renderVideo, renderBatch, WIDTH, HEIGHT, DURATION_SEC, FPS };
 })();
