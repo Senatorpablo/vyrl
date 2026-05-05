@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles-light.css">
-  <script src="procedural-faces.js"></script>
+  <script src="assets/real-faces.js"></script>
   <script src="generator.js"></script>
   <script src="renderer.js"></script>
 </head>
@@ -55,7 +55,7 @@
         <form class="hero-form" id="heroForm" onsubmit="return handleStart(event)">
           <div class="input-wrap">
             <span class="input-prefix">yourbrand.co.uk</span>
-            <input type="url" placeholder="Enter your website URL" class="hero-input" id="heroUrl" required>
+            <input type="text" placeholder="Enter your website (e.g. glossier.com)" class="hero-input" id="heroUrl" required>
             <button type="submit" class="btn-primary btn-pill">Generate My Influencer →</button>
           </div>
         </form>
@@ -317,10 +317,54 @@
       <h2>Ready to build your AI influencer army?</h2>
       <p>Enter your website. Get your brand ambassador. Deploy thousands of videos. It's that simple.</p>
       <form class="cta-form" onsubmit="return handleStart(event)">
-        <input type="url" placeholder="yourbrand.co.uk" class="cta-input" id="ctaUrl" required>
+        <input type="text" placeholder="yourbrand.co.uk" class="cta-input" id="ctaUrl" required>
         <button type="submit" class="btn-primary btn-pill">Generate My Influencer Free →</button>
       </form>
       <p class="cta-meta">No credit card · 5-minute setup · ASA compliant</p>
+    </div>
+  </section>
+
+  <!-- Demo Videos — Pre-rendered examples from ~/Developer/vyrl/output/ -->
+  <!-- To add more: drop .mp4 files in output/ and list them here -->
+  <section class="demo-videos" id="demo">
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">Demo Reel</span></span>
+      <h2>See AI UGC in action</h2>
+      <p class="section-sub">Actual pre-rendered influencer videos — playable right here.</p>
+    </div>
+    <div class="demo-grid">
+      <!-- cosylondon brand -->
+      <div class="demo-card">
+        <video src="output/cosylondon-grwm-shorts.mp4" poster="" controls playsinline preload="metadata"
+               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
+        <div class="demo-cap">CosyLondon · GRWM · Shorts</div>
+      </div>
+      <div class="demo-card">
+        <video src="output/cosylondon-mini-haul-reels.mp4" poster="" controls playsinline preload="metadata"
+               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
+        <div class="demo-cap">CosyLondon · Mini Haul · Reels</div>
+      </div>
+      <div class="demo-card">
+        <video src="output/cosylondon-honest-review-tiktok.mp4" poster="" controls playsinline preload="metadata"
+               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
+        <div class="demo-cap">CosyLondon · Honest Review · TikTok</div>
+      </div>
+      <!-- glowlab_club brand -->
+      <div class="demo-card">
+        <video src="output/glowlab_club-grwm-shorts.mp4" poster="" controls playsinline preload="metadata"
+               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
+        <div class="demo-cap">GlowLab · GRWM · Shorts</div>
+      </div>
+      <div class="demo-card">
+        <video src="output/glowlab_club-mini-haul-reels.mp4" poster="" controls playsinline preload="metadata"
+               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
+        <div class="demo-cap">GlowLab · Mini Haul · Reels</div>
+      </div>
+      <div class="demo-card">
+        <video src="output/glowlab_club-honest-review-tiktok.mp4" poster="" controls playsinline preload="metadata"
+               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
+        <div class="demo-cap">GlowLab · Honest Review · TikTok</div>
+      </div>
     </div>
   </section>
 
