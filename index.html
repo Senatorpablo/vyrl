@@ -3,701 +3,324 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VYRL — Generate Your AI Influencer Army in Seconds</title>
-  <meta name="description" content="Enter your website. Generate a photorealistic AI brand ambassador. Deploy thousands of UGC videos across TikTok, Reels, and Shorts. No creators, no contracts.">
-  <meta name="theme-color" content="#0A0A0B">
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
+  <title>VYRL — Don't Find Influencers. Generate Them.</title>
+  <meta name="description" content="Enter your website. VYRL creates a photorealistic AI brand ambassador, then fires off thousands of scroll-stopping UGC videos across every platform. No contracts, no waiting.">
+  <meta name="theme-color" content="#FDF9F6">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon-light.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon-light.svg">
   
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
-  <meta property="og:title" content="VYRL — Generate Your AI Influencer Army in Seconds">
+  <meta property="og:title" content="VYRL — Don't Find Influencers. Generate Them.">
   <meta property="og:description" content="Enter your website. Generate a photorealistic AI brand ambassador. Deploy thousands of UGC videos.">
-  <meta property="og:image" content="https://senatorpablo.github.io/vyrl/assets/og-image.svg">
-  <meta property="og:site_name" content="VYRL">
+  <meta property="og:image" content="https://senatorpablo.github.io/vyrl/assets/og-image-light.svg">
   <meta property="og:locale" content="en_GB">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="VYRL — Generate Your AI Influencer Army in Seconds">
-  <meta name="twitter:description" content="Enter your website. Generate a photorealistic AI brand ambassador. Deploy thousands of UGC videos.">
-  <meta name="twitter:image" content="https://senatorpablo.github.io/vyrl/assets/og-image.svg">
   
-  <!-- Schema -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "VYRL",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web",
-    "description": "AI-powered influencer video generation platform for UK brands. Create photorealistic brand ambassadors and deploy UGC videos across social platforms.",
-    "offers": {
-      "@type": "Offer",
-      "price": "299",
-      "priceCurrency": "GBP",
-      "description": "Pro monthly plan"
-    }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "VYRL",
-    "url": "https://senatorpablo.github.io/vyrl",
-    "logo": "https://senatorpablo.github.io/vyrl/assets/logo.svg",
-    "description": "AI Influencer Studio — generate photorealistic brand ambassadors from your website URL. UK-built.",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "London",
-      "addressCountry": "GB"
-    }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {"@type": "Question", "name": "How does VYRL create AI influencers?", "acceptedAnswer": {"@type": "Answer", "text": "Enter your website URL and VYRL's AI scans your brand, products, audience, and tone. Within minutes you get a photorealistic AI brand ambassador ready to create content."}},
-      {"@type": "Question", "name": "Can I customise my AI influencer's appearance?", "acceptedAnswer": {"@type": "Answer", "text": "Absolutely. Choose age, gender, ethnicity, style, voice accent — even upload a reference photo for vibe matching. Your influencer, your rules."}},
-      {"@type": "Question", "name": "What platforms can I post to?", "acceptedAnswer": {"@type": "Answer", "text": "TikTok, Instagram Reels, YouTube Shorts, LinkedIn, and X. Schedule and post from one dashboard."}},
-      {"@type": "Question", "name": "Is this legal in the UK?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. All AI-generated content is clearly watermarked as synthetic media in line with UK ASA guidelines. Your influencer is 100% AI — no rights, no royalties, no personality disputes."}},
-      {"@type": "Question", "name": "Do I own the influencer?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Your AI influencer is exclusive to your brand. No other brand can use the same influencer. Full commercial rights included in all plans."}}
-    ]
-  }
-  </script>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles-light.css">
+  <script src="faces.js"></script>
   <script src="generator.js"></script>
   <script src="renderer.js"></script>
 </head>
 <body>
-  <!-- Loading Screen -->
-  <div class="loader" id="loader">
-    <div class="loader-content">
-      <svg class="loader-logo" viewBox="0 0 120 40" fill="none">
-        <text x="0" y="32" font-family="Geist, sans-serif" font-weight="900" font-size="36" fill="#7C3AED">V</text>
-        <text x="32" y="32" font-family="Geist, sans-serif" font-weight="800" font-size="36" fill="#A855F7">Y</text>
-        <text x="60" y="32" font-family="Geist, sans-serif" font-weight="700" font-size="36" fill="#C084FC">R</text>
-        <text x="88" y="32" font-family="Geist, sans-serif" font-weight="600" font-size="36" fill="#06B6D4">L</text>
-      </svg>
-    </div>
-  </div>
-
-  <!-- Generation Modal -->
-  <div class="gen-overlay" id="genOverlay">
-    <div class="gen-modal" id="genModal">
-      <!-- Step 1: Progress -->
-      <div class="gen-phase" id="genPhase1">
-        <div class="gen-spinner-lg"></div>
-        <h3 id="genStatus">Analysing your brand...</h3>
-        <div class="gen-progress">
-          <div class="gen-progress-bar" id="genProgressBar"></div>
-        </div>
-        <div class="gen-steps">
-          <div class="gen-step active" data-step="scrape">
-            <span class="gen-step-icon">🌐</span>
-            <span>Scanning website</span>
-          </div>
-          <div class="gen-step" data-step="analyze">
-            <span class="gen-step-icon">🧠</span>
-            <span>Analysing brand DNA</span>
-          </div>
-          <div class="gen-step" data-step="influencer">
-            <span class="gen-step-icon">✨</span>
-            <span>Generating influencer</span>
-          </div>
-          <div class="gen-step" data-step="videos">
-            <span class="gen-step-icon">🎬</span>
-            <span>Creating videos</span>
-          </div>
-          <div class="gen-step" data-step="render">
-            <span class="gen-step-icon">🎥</span>
-            <span>Rendering video files</span>
-          </div>
-        </div>
-        <p class="gen-hint">This takes about 10-15 seconds while we build your AI brand ambassador</p>
-      </div>
-
-      <!-- Step 2: Results -->
-      <div class="gen-phase" id="genPhase2" style="display:none">
-        <button class="gen-close" id="genClose">×</button>
-        <div class="gen-result-header">
-          <div class="gen-success-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            Influencer Generated
-          </div>
-          <h2 id="genBrandName">Your Brand</h2>
-        </div>
-
-        <!-- Influencer Card -->
-        <div class="gen-influencer-card" id="genInfCard">
-          <div class="gen-inf-avatar">
-            <div class="gen-avatar-img" id="genAvatarImg">
-              <span id="genInitials">V</span>
-            </div>
-            <div class="gen-avatar-ring"></div>
-          </div>
-          <div class="gen-inf-details">
-            <h3 id="genInfName">Maya, 24</h3>
-            <span class="gen-inf-style" id="genInfStyle">Beauty & Wellness</span>
-            <p class="gen-inf-bio" id="genInfBio">Your AI brand ambassador</p>
-            <div class="gen-voice-badge">
-              <svg viewBox="0 0 20 20" fill="currentColor" width="14"><path d="M10 2a3 3 0 00-3 3v4a3 3 0 006 0V5a3 3 0 00-3-3z"/><path d="M5 10a5 5 0 0010 0h-2a3 3 0 01-6 0H5z"/></svg>
-              <span id="genVoiceAccent">British — RP</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Brand analysis summary -->
-        <div class="gen-analysis" id="genAnalysis">
-          <div class="gen-analysis-item">
-            <strong>Industry</strong>
-            <span id="genIndustry">Beauty</span>
-          </div>
-          <div class="gen-analysis-item">
-            <strong>Brand Tone</strong>
-            <span id="genTones">Friendly, Bold</span>
-          </div>
-          <div class="gen-analysis-item">
-            <strong>Products</strong>
-            <span id="genProducts">Skincare, Serum</span>
-          </div>
-          <div class="gen-analysis-item">
-            <strong>Scraped From</strong>
-            <span id="genSource">Direct site analysis ✓</span>
-          </div>
-        </div>
-
-        <!-- Video Grid -->
-        <div class="gen-videos-section">
-          <h3>Generated Video Content</h3>
-          <div class="gen-videos-grid" id="genVideosGrid"></div>
-        </div>
-
-        <!-- Actions -->
-        <div class="gen-actions">
-          <button class="btn-primary btn-large" id="genStartAgain">Generate Another →</button>
-          <button class="btn-outline" onclick="document.getElementById('genOverlay').style.display='none'">Close</button>
-        </div>
-      </div>
-
-      <!-- Error State -->
-      <div class="gen-phase" id="genPhaseErr" style="display:none">
-        <h3>⚠️ Couldn't reach your site</h3>
-        <p id="genErrMsg">Your site may block external access.</p>
-        <div class="gen-fallback-card">
-          <p>We built your influencer from your domain name instead. Results below:</p>
-        </div>
-        <button class="btn-primary" id="genShowFallback">Show My Influencer →</button>
-      </div>
-    </div>
-  </div>
+  <div class="loader" id="loader"><div class="loader-spinner"></div></div>
 
   <!-- Nav -->
   <nav class="nav" id="nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">
-        <svg viewBox="0 0 100 30" fill="none" class="logo-svg">
-          <text x="0" y="26" font-family="Geist, sans-serif" font-weight="900" font-size="28">VYRL</text>
-        </svg>
-      </a>
+      <a href="#" class="nav-logo"><span class="logo-text">VYRL</span></a>
       <div class="nav-links">
+        <a href="#how">How It Works</a>
         <a href="#features">Features</a>
-        <a href="#how-it-works">How It Works</a>
+        <a href="#gallery">Gallery</a>
         <a href="#pricing">Pricing</a>
-        <a href="#faq">FAQ</a>
       </div>
-      <a href="#cta" class="nav-cta btn-primary-sm">Get Started</a>
-      <button class="hamburger" id="hamburger" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
+      <a href="#start" class="nav-btn btn-primary">Get started free</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
     </div>
   </nav>
 
   <!-- Hero -->
-  <section class="hero" id="hero">
-    <div class="hero-bg">
-      <div class="hero-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-      </div>
-    </div>
-    <div class="hero-content">
-      <div class="hero-badge">
-        <span class="badge-dot"></span> UK's #1 AI Influencer Studio
-      </div>
-      <h1 class="hero-title">
-        <span class="title-line">Don't find influencers.</span>
-        <span class="title-line gradient-text">Generate them.</span>
-      </h1>
-      <p class="hero-subtitle">
-        Enter your website. VYRL creates a photorealistic AI brand ambassador, then fires off thousands of scroll-stopping UGC videos across every platform. No contracts, no retainers, no waiting.
-      </p>
-      <form class="hero-form" id="heroForm" onsubmit="handleHeroSubmit(event)">
-        <div class="input-group">
-          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-          </svg>
-          <input type="url" placeholder="yourbrand.co.uk" class="hero-input" id="heroUrl" required>
-          <button type="submit" class="btn-primary">Generate My Influencer <span class="btn-arrow">→</span></button>
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="hero-chips">
+          <span class="chip chip-new">Just launched</span>
+          <span class="chip">🇬🇧 Built in London</span>
         </div>
-      </form>
-      <p class="hero-trust">Trusted by 1,200+ UK brands • 5-minute setup • No credit card needed</p>
-    </div>
-    
-    <!-- Floating phone mockups -->
-    <div class="hero-phones">
-      <div class="phone phone-main">
-        <div class="phone-screen">
-          <div class="phone-video">
-            <div class="phone-avatar">
-              <svg viewBox="0 0 100 100" fill="none">
-                <circle cx="50" cy="38" r="15" fill="#7C3AED" opacity="0.3"/>
-                <ellipse cx="50" cy="75" rx="28" ry="20" fill="#7C3AED" opacity="0.2"/>
-                <circle cx="50" cy="38" r="12" fill="url(#avatarGrad)"/>
-              </svg>
-            </div>
-            <div class="phone-caption">"This serum literally changed my skin in 48 hours. Not even joking. @glowlab"</div>
-            <div class="phone-brand">@glowlab_club</div>
+        <h1>Create your own AI Influencer</h1>
+        <p>Enter your website. VYRL analyses your brand and generates a photorealistic AI ambassador. Then fires off thousands of scroll-stopping UGC videos across TikTok, Reels, and Shorts.</p>
+        <form class="hero-form" id="heroForm" onsubmit="return handleStart(event)">
+          <div class="input-wrap">
+            <span class="input-prefix">yourbrand.co.uk</span>
+            <input type="url" placeholder="Enter your website URL" class="hero-input" id="heroUrl" required>
+            <button type="submit" class="btn-primary btn-pill">Generate My Influencer →</button>
+          </div>
+        </form>
+        <p class="hero-meta">No credit card required · 5-minute setup · ASA compliant</p>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-phone-stack">
+          <div class="hps-card hps-1">
+            <div class="hps-face"></div>
+            <div class="hps-cap">"Rate my glow up ✨ @glowlab_club"</div>
+          </div>
+          <div class="hps-card hps-2">
+            <div class="hps-face"></div>
+            <div class="hps-cap">"Got my order. Obsessed. 😍"</div>
+          </div>
+          <div class="hps-card hps-3">
+            <div class="hps-face"></div>
+            <div class="hps-cap">"GRWM + honest review 🎀"</div>
           </div>
         </div>
-      </div>
-      <div class="phone phone-left">
-        <div class="phone-screen">
-          <div class="phone-video">
-            <div class="phone-avatar">
-              <svg viewBox="0 0 100 100" fill="none">
-                <circle cx="50" cy="38" r="15" fill="#06B6D4" opacity="0.3"/>
-                <ellipse cx="50" cy="75" rx="28" ry="20" fill="#06B6D4" opacity="0.2"/>
-                <circle cx="50" cy="38" r="12" fill="url(#avatarGrad2)"/>
-              </svg>
-            </div>
-            <div class="phone-caption">"Just got my @fitfueluk order. This is a game changer for my morning routine 🔥"</div>
-            <div class="phone-brand">@fitfueluk</div>
-          </div>
+        <div class="hero-stats-pill">
+          <span>1,200+ UK brands</span>
+          <span class="stat-div">·</span>
+          <span>4.2M videos generated</span>
+          <span class="stat-div">·</span>
+          <span>8.7x avg. engagement</span>
         </div>
       </div>
-      <div class="phone phone-right">
-        <div class="phone-screen">
-          <div class="phone-video">
-            <div class="phone-avatar">
-              <svg viewBox="0 0 100 100" fill="none">
-                <circle cx="50" cy="38" r="15" fill="#A855F7" opacity="0.3"/>
-                <ellipse cx="50" cy="75" rx="28" ry="20" fill="#A855F7" opacity="0.2"/>
-                <circle cx="50" cy="38" r="12" fill="url(#avatarGrad3)"/>
-              </svg>
-            </div>
-            <div class="phone-caption">"POV: you found the comfiest loungewear that actually looks good outside 🧘‍♀️"</div>
-            <div class="phone-brand">@cosylondon</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Logo Bar -->
-  <section class="logo-bar">
-    <p class="logo-bar-label">Backed by the ecosystem</p>
-    <div class="logo-bar-track">
-      <span class="logo-item"><strong>TikTok</strong> Creator Marketplace</span>
-      <span class="logo-item"><strong>Meta</strong> Business Partner</span>
-      <span class="logo-item"><strong>YouTube</strong> Shorts API</span>
-      <span class="logo-item"><strong>Shopify</strong> App Store</span>
-      <span class="logo-item"><strong>Stripe</strong> Verified</span>
-      <span class="logo-item"><strong>ASA</strong> Compliant</span>
     </div>
   </section>
 
   <!-- How It Works -->
-  <section class="how-it-works" id="how-it-works">
-    <div class="section-header">
-      <div class="section-badge">How It Works</div>
-      <h2>From URL to UGC army<br><span class="gradient-text">in under 5 minutes</span></h2>
+  <section class="how" id="how">
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">How It Works</span></span>
+      <h2>From URL to UGC army in minutes</h2>
       <p class="section-sub">Three steps. Zero creators. Infinite content.</p>
     </div>
-    <div class="steps-grid">
+    <div class="steps-row">
       <div class="step-card">
-        <div class="step-number">01</div>
-        <div class="step-icon">
-          <svg viewBox="0 0 48 48" fill="none">
-            <rect x="8" y="8" width="32" height="32" rx="8" stroke="currentColor" stroke-width="2"/>
-            <path d="M8 18h32M18 8v32" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
-            <circle cx="34" cy="14" r="3" fill="#7C3AED"/>
-          </svg>
-        </div>
+        <span class="step-num">01</span>
+        <div class="step-img"><div class="si si-website"></div></div>
         <h3>Enter your website</h3>
-        <p>VYRL's AI reads your entire brand — products, voice, audience, visual identity — in seconds.</p>
-        <div class="step-arrow">→</div>
+        <p>VYRL's AI scans your entire brand — products, voice, audience, visual identity — in seconds.</p>
       </div>
       <div class="step-card">
-        <div class="step-number">02</div>
-        <div class="step-icon">
-          <svg viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="15" r="6" stroke="currentColor" stroke-width="2"/>
-            <path d="M12 38c0-6.6 5.4-12 12-12s12 5.4 12 12" stroke="currentColor" stroke-width="2"/>
-            <path d="M36 26l4 4 4-4" stroke="#06B6D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <span class="step-num">02</span>
+        <div class="step-img"><div class="si si-influencer"></div></div>
         <h3>Generate your influencer</h3>
         <p>Customise appearance, voice, and persona. Your photorealistic AI ambassador is exclusive to your brand.</p>
-        <div class="step-arrow">→</div>
       </div>
       <div class="step-card">
-        <div class="step-number">03</div>
-        <div class="step-icon">
-          <svg viewBox="0 0 48 48" fill="none">
-            <rect x="6" y="8" width="36" height="32" rx="6" stroke="currentColor" stroke-width="2"/>
-            <path d="M18 20l6 6-6 6" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <span class="step-num">03</span>
+        <div class="step-img"><div class="si si-deploy"></div></div>
         <h3>Deploy & scale</h3>
-        <p>Thousands of UGC videos auto-generated and scheduled across TikTok, Reels, and Shorts. Track what works. Double down.</p>
+        <p>Thousands of UGC videos auto-generated and scheduled across TikTok, Reels, and Shorts.</p>
       </div>
     </div>
   </section>
 
-  <!-- Features Grid -->
+  <!-- Features -->
   <section class="features" id="features">
-    <div class="section-header">
-      <div class="section-badge">AI Studio</div>
-      <h2>Everything you need to<br><span class="gradient-text">dominate short-form</span></h2>
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">AI Studio</span></span>
+      <h2>Why brands choose VYRL</h2>
     </div>
     <div class="features-grid">
-      <div class="feature-card glass-card">
-        <div class="feature-icon">🎬</div>
+      <div class="feat-card">
+        <div class="feat-icon">🎬</div>
         <h3>Clone Viral Formats</h3>
-        <p>VYRL analyses trending UGC formats and recreates them with your influencer. Hook, body, CTA — every beat cloned.</p>
-        <span class="feature-tag">Pattern Library</span>
+        <p>VYRL analyses trending UGC patterns and recreates them with your influencer — hook, body, CTA, every beat.</p>
       </div>
-      <div class="feature-card glass-card">
-        <div class="feature-icon">🗣️</div>
-        <h3>Voice Cloning</h3>
-        <p>Choose from 30+ British regional accents. Yorkshire, Scouse, Cockney, RP — your influencer speaks your market.</p>
-        <span class="feature-tag">UK Voices</span>
+      <div class="feat-card">
+        <div class="feat-icon">🗣️</div>
+        <h3>British Voice Packs</h3>
+        <p>30+ UK regional accents. RP, Scouse, Cockney, Mancunian, Yorkshire — your influencer speaks your market.</p>
       </div>
-      <div class="feature-card glass-card">
-        <div class="feature-icon">⚡</div>
-        <h3>Bulk Generation</h3>
-        <p>Generate 100 videos at once. Swipe left to reject, right to approve. Pick your winners, queue the rest.</p>
-        <span class="feature-tag">Blitz Mode</span>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>Blitz Mode</h3>
+        <p>Generate 100s of videos. Swipe right to approve, left to reject. Queue winners for posting. Like Tinder for content.</p>
       </div>
-      <div class="feature-card glass-card">
-        <div class="feature-icon">📊</div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
         <h3>Analytics Engine</h3>
-        <p>Track watch time, engagement rate, and conversion per video. VYRL auto-generates more of what's winning.</p>
-        <span class="feature-tag">Auto-Optimise</span>
+        <p>Track watch time, CTR, and conversion per video. VYRL auto-generates more of what's winning.</p>
       </div>
-      <div class="feature-card glass-card">
-        <div class="feature-icon">🏷️</div>
+      <div class="feat-card">
+        <div class="feat-icon">🏷️</div>
         <h3>White-Label Agency</h3>
-        <p>Run your own AI influencer agency. Custom branding, client dashboards, and reseller pricing. Built for UK agencies.</p>
-        <span class="feature-tag">Agency Tier</span>
+        <p>Run your own AI influencer agency. Custom branding, client dashboards, reseller pricing. Built for agencies.</p>
       </div>
-      <div class="feature-card glass-card">
-        <div class="feature-icon">🔒</div>
+      <div class="feat-card">
+        <div class="feat-icon">🔒</div>
         <h3>Exclusive Ownership</h3>
-        <p>Your AI influencer is yours alone. No other brand gets the same face or voice. Full commercial rights included.</p>
-        <span class="feature-tag">Exclusive</span>
+        <p>Your AI influencer is yours alone. No other brand gets the same face or voice. Full commercial rights.</p>
       </div>
     </div>
   </section>
 
-  <!-- Preview Section — Influencer Gallery -->
-  <section class="preview-section">
-    <div class="section-header">
-      <div class="section-badge">The Gallery</div>
-      <h2>Meet your next<br><span class="gradient-text">brand ambassador</span></h2>
+  <!-- Gallery -->
+  <section class="gallery" id="gallery">
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">The Gallery</span></span>
+      <h2>Meet your next brand ambassador</h2>
     </div>
-    <div class="influencer-grid">
-      <div class="influencer-card">
-        <div class="inf-image">
-          <div class="inf-generating">
-            <div class="inf-spinner"></div>
-            <span>Generating...</span>
-          </div>
-        </div>
-        <div class="inf-info">
-          <span class="inf-name">Maya, 24</span>
-          <span class="inf-style">Beauty & Wellness — London</span>
-        </div>
-      </div>
-      <div class="influencer-card">
-        <div class="inf-image" style="background: linear-gradient(135deg, #1a1a2e, #16213e)"></div>
-        <div class="inf-info">
-          <span class="inf-name">Josh, 28</span>
-          <span class="inf-style">Fitness & Nutrition — Manchester</span>
-        </div>
-      </div>
-      <div class="influencer-card">
-        <div class="inf-image" style="background: linear-gradient(135deg, #2d1b69, #1a0533)"></div>
-        <div class="inf-info">
-          <span class="inf-name">Priya, 26</span>
-          <span class="inf-style">Fashion & Lifestyle — Birmingham</span>
-        </div>
-      </div>
-      <div class="influencer-card">
-        <div class="inf-image" style="background: linear-gradient(135deg, #0f2027, #203a43)"></div>
-        <div class="inf-info">
-          <span class="inf-name">Leo, 32</span>
-          <span class="inf-style">Tech & Gaming — Edinburgh</span>
-        </div>
-      </div>
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Populated by JS from influencer library -->
     </div>
   </section>
 
-  <!-- Swipe Preview (Blitz Mode demo) -->
-  <section class="blitz-preview">
-    <div class="blitz-content">
+  <!-- Blitz Mode Demo -->
+  <section class="blitz">
+    <div class="blitz-inner">
       <div class="blitz-text">
-        <div class="section-badge">Blitz Mode</div>
-        <h2>Swipe through<br><span class="gradient-text">1,000+ videos</span></h2>
-        <p>Like Tinder, but for content. VYRL auto-generates thousands of UGC videos for your brand. Swipe right to approve, left to bin. Queue winners for posting.</p>
-        <ul class="blitz-features">
-          <li><svg viewBox="0 0 20 20" fill="#06B6D4"><path d="M8 13l-3-3 1.4-1.4L8 10.2l5.6-5.6L15 6z"/></svg> Hundreds of variations per product</li>
-          <li><svg viewBox="0 0 20 20" fill="#06B6D4"><path d="M8 13l-3-3 1.4-1.4L8 10.2l5.6-5.6L15 6z"/></svg> Approve/reject in seconds</li>
-          <li><svg viewBox="0 0 20 20" fill="#06B6D4"><path d="M8 13l-3-3 1.4-1.4L8 10.2l5.6-5.6L15 6z"/></svg> Auto-schedule winners</li>
+        <span class="section-chips"><span class="chip chip-accent">Blitz Mode</span></span>
+        <h2>Swipe through 1,000s of videos</h2>
+        <p>Like Tinder, but for content. VYRL auto-generates hundreds of UGC video variations. Swipe right to approve, left to bin. Queue winners for posting.</p>
+        <ul class="blitz-list">
+          <li>Hundreds of variations per product</li>
+          <li>Approve or reject in seconds</li>
+          <li>Auto-schedule winners to TikTok, Reels & Shorts</li>
         </ul>
-        <a href="#cta" class="btn-primary">Try Blitz Mode Free →</a>
+        <a href="#start" class="btn-primary btn-pill">Try Blitz Mode →</a>
       </div>
       <div class="blitz-phone">
-        <div class="phone-frame">
-          <div class="phone-notch"></div>
-          <div class="phone-swipe-area" id="swipeArea">
-            <div class="swipe-card" id="swipeCard">
-              <div class="swipe-vid">
-                <div class="swipe-avatar">
-                  <svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="22" r="10" fill="#7C3AED" opacity="0.3"/><ellipse cx="30" cy="50" rx="18" ry="14" fill="#7C3AED" opacity="0.15"/></svg>
-                </div>
-                <p class="swipe-cap">"You guys. This jacket. I've worn it 6 times this week. Zero regrets."</p>
-              </div>
-              <div class="swipe-actions">
-                <button class="swipe-btn reject" id="swipeReject">✕</button>
-                <button class="swipe-btn approve" id="swipeApprove">♥</button>
-              </div>
+        <div class="bp-frame">
+          <div class="bp-notch"></div>
+          <div class="bp-screen">
+            <div class="bp-swipe-card" id="bpSwipeCard">
+              <div class="bp-face"></div>
+              <p class="bp-cap">"You guys. This jacket. 6 wears this week. Zero regrets. @cosylondon"</p>
+            </div>
+            <div class="bp-actions">
+              <button class="bp-btn bp-rej" id="bpReject">✕</button>
+              <button class="bp-btn bp-app" id="bpApprove">♥</button>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats -->
-  <section class="stats-section">
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-number" data-target="4.2">0</div>
-        <div class="stat-suffix">M</div>
-        <p class="stat-label">Videos Generated</p>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="1200">0</div>
-        <div class="stat-suffix">+</div>
-        <p class="stat-label">UK Brands</p>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="8.7">0</div>
-        <div class="stat-suffix">x</div>
-        <p class="stat-label">Avg. Engagement Lift</p>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="94">0</div>
-        <div class="stat-suffix">%</div>
-        <p class="stat-label">Video Approval Rate</p>
       </div>
     </div>
   </section>
 
   <!-- Pricing -->
   <section class="pricing" id="pricing">
-    <div class="section-header">
-      <div class="section-badge">Pricing</div>
-      <h2>Simple pricing.<br><span class="gradient-text">All killer, no filler.</span></h2>
-      <p class="section-sub">UK-built, UK-priced. All plans include exclusive influencer ownership.</p>
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">Pricing</span></span>
+      <h2>Simple. All killer, no filler.</h2>
     </div>
     <div class="pricing-grid">
-      <div class="pricing-card glass-card">
-        <div class="pricing-level">Starter</div>
-        <div class="pricing-price">£49<span>/mo</span></div>
-        <p class="pricing-desc">Perfect for testing the waters with AI content.</p>
-        <ul class="pricing-features">
+      <div class="price-card">
+        <div class="price-tier">Starter</div>
+        <div class="price-amt">£49<span>/mo</span></div>
+        <p>Perfect for testing AI content.</p>
+        <ul class="price-feats">
           <li>1 AI Influencer</li>
           <li>30 videos/month</li>
           <li>2 platform connections</li>
           <li>Basic analytics</li>
           <li>Standard voices</li>
         </ul>
-        <a href="#cta" class="btn-outline">Start Free Trial</a>
+        <a href="#start" class="btn-outline">Start Free Trial</a>
       </div>
-      <div class="pricing-card glass-card popular">
-        <div class="pricing-badge">Most Popular</div>
-        <div class="pricing-level">Pro</div>
-        <div class="pricing-price">£299<span>/mo</span></div>
-        <p class="pricing-desc">The full VYRL experience. This is where the magic happens.</p>
-        <ul class="pricing-features">
+      <div class="price-card price-pop">
+        <div class="price-pop-badge">Most Popular</div>
+        <div class="price-tier">Pro</div>
+        <div class="price-amt">£299<span>/mo</span></div>
+        <p>The full VYRL experience.</p>
+        <ul class="price-feats">
           <li>3 AI Influencers</li>
           <li>Unlimited videos</li>
           <li>All platform connections</li>
           <li>Advanced analytics</li>
           <li>British accent voice pack</li>
-          <li>Blitz Mode</li>
+          <li>Blitz Mode included</li>
           <li>Clone viral formats</li>
           <li>Priority generation</li>
         </ul>
-        <a href="#cta" class="btn-primary">Start Pro Trial →</a>
+        <a href="#start" class="btn-primary btn-pill">Start Pro Trial →</a>
       </div>
-      <div class="pricing-card glass-card">
-        <div class="pricing-level">Agency</div>
-        <div class="pricing-price">£799<span>/mo</span></div>
-        <p class="pricing-desc">White-label everything. Run your own AI influencer empire.</p>
-        <ul class="pricing-features">
+      <div class="price-card">
+        <div class="price-tier">Agency</div>
+        <div class="price-amt">£799<span>/mo</span></div>
+        <p>White-label everything.</p>
+        <ul class="price-feats">
           <li>25 AI Influencers</li>
           <li>Unlimited everything</li>
           <li>White-label dashboard</li>
           <li>Client management</li>
           <li>Reseller pricing</li>
           <li>API access</li>
-          <li>Dedicated account manager</li>
+          <li>Dedicated manager</li>
           <li>Custom voice training</li>
         </ul>
-        <a href="#cta" class="btn-outline">Talk to Us</a>
+        <a href="#start" class="btn-outline">Talk to Us</a>
       </div>
     </div>
   </section>
 
   <!-- Testimonials -->
   <section class="testimonials">
-    <div class="section-header">
-      <div class="section-badge">Testimonials</div>
-      <h2>What UK brands<br><span class="gradient-text">are saying</span></h2>
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">Testimonials</span></span>
+      <h2>What UK brands say</h2>
     </div>
     <div class="testimonial-carousel" id="testimonialCarousel">
       <div class="testimonial-track" id="testimonialTrack">
-        <div class="testimonial-card glass-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <p>"We went from 0 to 4.2M views in our first month. Our AI influencer feels more authentic than half the real creators we used to pay. Game changer for a lean team like ours."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar" style="background: linear-gradient(135deg, #7C3AED, #06B6D4)"></div>
-            <div>
-              <strong>Sarah Mitchell</strong>
-              <span>CMO, GlowLab London</span>
-            </div>
+        <div class="testim-card">
+          <div class="testim-stars">★★★★★</div>
+          <p>"We went from 0 to 4.2M views in our first month. Our AI influencer feels more authentic than half the real creators we used to pay."</p>
+          <div class="testim-author">
+            <div class="ta-avatar taa-1"></div>
+            <div><strong>Sarah Mitchell</strong><span>CMO, GlowLab London</span></div>
           </div>
         </div>
-        <div class="testimonial-card glass-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <p>"We were spending £12k/month on influencer retainers. Now we spend £299. The content is better, and we own the influencer. The agency plan is printing money for us."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar" style="background: linear-gradient(135deg, #06B6D4, #A855F7)"></div>
-            <div>
-              <strong>James Okonkwo</strong>
-              <span>Founder, SocialProof Agency</span>
-            </div>
+        <div class="testim-card">
+          <div class="testim-stars">★★★★★</div>
+          <p>"£12k/month on influencer retainers → £299/month on VYRL. The content is better and we own the influencer. Printing money."</p>
+          <div class="testim-author">
+            <div class="ta-avatar taa-2"></div>
+            <div><strong>James Okonkwo</strong><span>Founder, SocialProof Agency</span></div>
           </div>
         </div>
-        <div class="testimonial-card glass-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <p>"The Scouse accent voice pack got our Liverpool-based brand 3x engagement vs. generic American voices. VYRL actually understands UK audiences."</p>
-          <div class="testimonial-author">
-            <div class="testimonial-avatar" style="background: linear-gradient(135deg, #A855F7, #7C3AED)"></div>
-            <div>
-              <strong>Emily Watson</strong>
-              <span>Brand Director, Northern Threads</span>
-            </div>
+        <div class="testim-card">
+          <div class="testim-stars">★★★★★</div>
+          <p>"The Scouse accent pack got our Liverpool brand 3x engagement vs. generic American voices. VYRL actually gets UK audiences."</p>
+          <div class="testim-author">
+            <div class="ta-avatar taa-3"></div>
+            <div><strong>Emily Watson</strong><span>Brand Director, Northern Threads</span></div>
           </div>
         </div>
       </div>
-      <div class="testimonial-nav">
-        <button class="testimonial-dot active" data-index="0"></button>
-        <button class="testimonial-dot" data-index="1"></button>
-        <button class="testimonial-dot" data-index="2"></button>
+      <div class="testim-nav">
+        <button class="testim-dot active" data-idx="0"></button>
+        <button class="testim-dot" data-idx="1"></button>
+        <button class="testim-dot" data-idx="2"></button>
       </div>
     </div>
   </section>
 
   <!-- FAQ -->
   <section class="faq" id="faq">
-    <div class="section-header">
-      <div class="section-badge">FAQ</div>
-      <h2>You've got questions.<br><span class="gradient-text">We've got answers.</span></h2>
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">FAQ</span></span>
+      <h2>You ask. We answer.</h2>
     </div>
     <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-question">
-          How does VYRL create AI influencers?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <p>Enter your website URL and VYRL's AI scans your brand — products, audience demographics, visual identity, and tone of voice. Within minutes, you get a photorealistic AI brand ambassador complete with a personality profile. You can further customise appearance, voice accent, and content style before generating videos.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          Can I customise my influencer's appearance?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <p>Absolutely. Choose from age ranges, genders, ethnicities, style aesthetics, and voice accents. You can even upload a mood board or reference photo, and VYRL will match the vibe while creating a completely unique face. Your influencer, your creative direction.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          What platforms can I post to?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <p>TikTok, Instagram Reels, YouTube Shorts, LinkedIn, and X (Twitter). All from one dashboard. VYRL optimises video format and aspect ratio automatically for each platform. You can schedule posts in advance or publish immediately.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          Is this legal in the UK?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <p>Yes. All VYRL-generated content is clearly labelled as AI-generated in compliance with UK Advertising Standards Authority (ASA) guidelines for synthetic media. Your AI influencer is 100% synthetic — no real person, no personality rights, no royalties, no disputes. We provide downloadable compliance documentation for every video.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          Do I own my AI influencer?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <p>Yes. Your AI influencer is exclusive to your brand for the duration of your subscription. No other brand will ever use the same face or voice. Full commercial rights are included in all plans. You own the content you generate, forever.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-question">
-          How is VYRL different from other tools?
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-answer">
-          <p>VYRL is purpose-built for the UK market. We offer 30+ British regional accent voice packs, ASA-compliant content labelling, UK-based support, and pricing in GBP. Most importantly, our Blitz Mode generates thousands of video variations at once — you swipe to approve rather than prompting each video individually. It's a factory, not a workshop.</p>
-        </div>
-      </div>
+      <div class="faq-item"><button class="faq-q">How does VYRL create AI influencers? <span>+</span></button><div class="faq-a"><p>Enter your website URL. VYRL scans your brand — products, audience, visual identity, tone. Within minutes you get a photorealistic AI brand ambassador ready to create content.</p></div></div>
+      <div class="faq-item"><button class="faq-q">Can I customise my influencer? <span>+</span></button><div class="faq-a"><p>Absolutely. Choose age, gender, ethnicity, style, and voice accent. Upload a mood board for vibe matching. Your influencer, your rules.</p></div></div>
+      <div class="faq-item"><button class="faq-q">What platforms can I post to? <span>+</span></button><div class="faq-a"><p>TikTok, Instagram Reels, YouTube Shorts, LinkedIn, and X. All from one dashboard. Auto-formatted per platform.</p></div></div>
+      <div class="faq-item"><button class="faq-q">Is this legal in the UK? <span>+</span></button><div class="faq-a"><p>Yes. All VYRL content is labelled as AI-generated per ASA guidelines. Your influencer is 100% synthetic — no personality rights, no royalties, no disputes.</p></div></div>
+      <div class="faq-item"><button class="faq-q">Do I own my AI influencer? <span>+</span></button><div class="faq-a"><p>Yes. Your influencer is exclusive to your brand. No other brand gets the same face or voice. Full commercial rights included.</p></div></div>
     </div>
   </section>
 
   <!-- CTA -->
-  <section class="cta-section" id="cta">
+  <section class="cta" id="start">
     <div class="cta-card">
-      <div class="cta-orb"></div>
-      <h2>Ready to build your<br>AI influencer army?</h2>
+      <h2>Ready to build your AI influencer army?</h2>
       <p>Enter your website. Get your brand ambassador. Deploy thousands of videos. It's that simple.</p>
-      <form class="cta-form" onsubmit="handleCTASubmit(event)">
+      <form class="cta-form" onsubmit="return handleStart(event)">
         <input type="url" placeholder="yourbrand.co.uk" class="cta-input" id="ctaUrl" required>
-        <button type="submit" class="btn-primary btn-large">Generate My Influencer Free →</button>
+        <button type="submit" class="btn-primary btn-pill">Generate My Influencer Free →</button>
       </form>
-      <p class="cta-disclaimer">No credit card required. 5-minute setup. ASA-compliant.</p>
+      <p class="cta-meta">No credit card · 5-minute setup · ASA compliant</p>
     </div>
   </section>
 
@@ -705,44 +328,55 @@
   <footer class="footer">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="#" class="footer-logo">
-          <svg viewBox="0 0 80 28" fill="none" class="logo-svg">
-            <text x="0" y="24" font-family="Geist, sans-serif" font-weight="900" font-size="24">VYRL</text>
-          </svg>
-        </a>
+        <span class="footer-logo">VYRL</span>
         <p>AI Influencer Studio. Built in London 🇬🇧</p>
-        <p class="footer-small">© <span id="footerYear">2026</span> VYRL. All rights reserved.</p>
+        <p class="footer-sm">© <span id="footerYear">2026</span> VYRL</p>
       </div>
-      <div class="footer-col">
-        <strong>Product</strong>
-        <a href="#features">Features</a>
-        <a href="#how-it-works">How It Works</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#cta">Get Started</a>
-      </div>
-      <div class="footer-col">
-        <strong>Company</strong>
-        <a href="#">About</a>
-        <a href="#">Blog</a>
-        <a href="#">Careers</a>
-        <a href="mailto:hello@vyrl.co.uk">Contact</a>
-      </div>
-      <div class="footer-col">
-        <strong>Legal</strong>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Cookie Policy</a>
-        <a href="#">ASA Compliance</a>
-      </div>
+      <div class="footer-col"><strong>Product</strong><a href="#features">Features</a><a href="#how">How It Works</a><a href="#pricing">Pricing</a></div>
+      <div class="footer-col"><strong>Company</strong><a href="#">About</a><a href="#">Blog</a><a href="mailto:hello@vyrl.co.uk">Contact</a></div>
+      <div class="footer-col"><strong>Legal</strong><a href="#">Privacy</a><a href="#">Terms</a><a href="#">ASA Compliance</a></div>
     </div>
   </footer>
 
-  <!-- Back to Top -->
-  <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+  <!-- Gen Overlay -->
+  <div class="gen-overlay" id="genOverlay">
+    <div class="gen-modal">
+      <div class="gen-phase" id="genPhaseProgress">
+        <div class="gen-spinner"></div>
+        <h3 id="genStatus">Analysing your brand...</h3>
+        <div class="gen-bar"><div class="gen-bar-fill" id="genBarFill"></div></div>
+        <div class="gen-steps" id="genStepList"></div>
+      </div>
+      <div class="gen-phase" id="genPhaseResults" style="display:none">
+        <button class="gen-close" id="genClose">×</button>
+        <div class="gr-header">
+          <span class="gr-badge">✓ Generated</span>
+          <h2 id="grBrandName">Brand</h2>
+        </div>
+        <div class="gr-influencer">
+          <div class="gri-avatar" id="griAvatar"></div>
+          <div class="gri-info">
+            <h3 id="griName">Influencer</h3>
+            <span class="gri-style" id="griStyle">Style</span>
+            <p class="gri-bio" id="griBio">Bio</p>
+            <span class="gri-voice" id="griVoice">Voice</span>
+          </div>
+        </div>
+        <div class="gr-analysis" id="grAnalysis"></div>
+        <!-- Video gallery -->
+        <div class="gr-videos">
+          <h3>Your AI UGC Videos</h3>
+          <div class="gr-video-grid" id="grVideoGrid"></div>
+        </div>
+        <div class="gr-actions">
+          <button class="btn-primary btn-pill" id="genAgain">Generate Another →</button>
+          <button class="btn-outline" onclick="document.getElementById('genOverlay').style.display='none'">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast">✓ Success! We'll be in touch shortly.</div>
-
-  <script src="app.js"></script>
+  <div class="toast" id="toast"></div>
+  <script src="app-light.js"></script>
 </body>
 </html>
