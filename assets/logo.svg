@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40">
+  <defs>
+    <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="40%" stop-color="#A855F7"/>
+      <stop offset="70%" stop-color="#C084FC"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+  </defs>
+  <text x="0" y="30" font-family="'Geist', 'Inter', sans-serif" font-weight="900" font-size="32" fill="url(#logoGrad)" letter-spacing="-0.5">VYRL</text>
+</svg>
