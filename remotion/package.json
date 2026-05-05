@@ -1,0 +1,27 @@
+{
+  "name": "vyrl-remotion",
+  "version": "1.0.0",
+  "description": "VYRL AI Influencer Video Renderer — Remotion-powered high-quality UGC video generation",
+  "scripts": {
+    "start": "remotion studio",
+    "render": "npx tsx batch-render.ts",
+    "render:gloss": "npx tsx batch-render.ts --brand=gloss --count=4",
+    "render:fit": "npx tsx batch-render.ts --brand=fit --count=4",
+    "render:tech": "npx tsx batch-render.ts --brand=tech --count=4",
+    "render:cosy": "npx tsx batch-render.ts --brand=cosy --count=4",
+    "test": "npx tsx test-render.ts"
+  },
+  "dependencies": {
+    "@remotion/bundler": "^4.0.457",
+    "@remotion/cli": "^4.0.0",
+    "@remotion/renderer": "^4.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0"
+  }
+}
