@@ -194,7 +194,13 @@
     clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3500);
   }
 
-  function closeOverlay() { ov.classList.remove('active'); document.body.style.overflow = ''; }
+  function closeOverlay() {
+    ov.classList.remove('active');
+    document.body.style.overflow = '';
+    // Stop all canvas animations when overlay closes
+    if (window._vyrlCanvasObserver) { window._vyrlCanvasObserver.disconnect(); window._vyrlCanvasObserver = null; }
+    document.querySelectorAll('#grVideoGrid canvas').forEach(cv => cv._previewStop?.());
+  }
 
   // ── Customisation options state ──
   const opts = { gender: 'female', age: 'any', style: 'any', voice: 'any' };
@@ -221,6 +227,7 @@
   // ── Close handlers ──
   document.getElementById('genCloseCustomise')?.addEventListener('click', closeOverlay);
   document.getElementById('genClose')?.addEventListener('click', closeOverlay);
+  document.getElementById('genCloseResults')?.addEventListener('click', closeOverlay);
   ov.addEventListener('click', e => { if (e.target === ov) closeOverlay(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && ov.classList.contains('active')) closeOverlay(); });
   document.getElementById('genAgain')?.addEventListener('click', () => { closeOverlay(); document.getElementById('heroUrl')?.focus(); });
@@ -279,11 +286,14 @@
       `<div class="gr-ai"><strong>Products</strong><span>${brand.products.slice(0, 3).join(', ')}</span></div>` +
       `<div class="gr-ai"><strong>Source</strong><span>${brand.scraperWorked ? 'Direct site ✓' : 'Domain analysis'}</span></div>`;
 
-    // Influencer card
+    // Influencer card — find matching face from gallery by name then gender
     const av = document.getElementById('griAvatar'); av.innerHTML = '';
-    const face = RealFaces.getFace(influencer.name.toLowerCase(), influencer.gender || 'female');
-    if (face) {
-      const img = document.createElement('img'); img.src = face; img.style.cssText = 'width:100%;height:100%;object-fit:cover;'; av.appendChild(img);
+    const allFaces = RealFaces.getGalleryFaces();
+    const matchedFace = allFaces.find(f => f.name.toLowerCase() === influencer.name.toLowerCase())
+      || allFaces.find(f => f.gender === (influencer.gender || 'female'))
+      || allFaces[0];
+    if (matchedFace && matchedFace.faceData) {
+      const img = document.createElement('img'); img.src = matchedFace.faceData; img.style.cssText = 'width:100%;height:100%;object-fit:cover;'; av.appendChild(img);
     } else {
       const d = document.createElement('div');
       d.style.cssText = 'width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#FF530F,#FF9500);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2em;font-weight:900;';
@@ -343,6 +353,40 @@
       vg.appendChild(wrap);
     });
   }
+
+  // ── Demo Grid — live canvas previews ──
+  (async function buildDemoGrid() {
+    const dg = document.getElementById('demoGrid');
+    if (!dg) return;
+    const faces = RealFaces.getGalleryFaces();
+    const demoCases = [
+      { name: faces[0]?.name || 'Sophia', gender: 'female', caption: 'Rate my glow up ✨ this routine changed everything for my skin', platform: 'TikTok', format: 'GRWM' },
+      { name: faces[1]?.name || 'Jade',   gender: 'female', caption: 'Honest review after 30 days — is it actually worth the hype?', platform: 'Reels', format: 'Honest Review' },
+      { name: faces[2]?.name || 'Marcus', gender: 'male',   caption: 'POV: you finally found the supplement that actually works 💪', platform: 'Shorts', format: 'Hook + Demo' },
+    ];
+    for (let i = 0; i < demoCases.length; i++) {
+      const d = demoCases[i];
+      try {
+        const canvas = await VYRLRenderer.renderPreview(
+          { name: d.name, gender: d.gender, voice: { name: 'RP' } },
+          { caption: d.caption, platform: d.platform, format: d.format },
+          i
+        );
+        const wrap = document.createElement('div'); wrap.className = 'demo-card';
+        wrap.appendChild(canvas);
+        const cap = document.createElement('div'); cap.className = 'demo-cap';
+        cap.textContent = `${d.name} · ${d.format} · ${d.platform}`;
+        wrap.appendChild(cap);
+        dg.appendChild(wrap);
+        // Auto-play via IntersectionObserver
+        const obs = new IntersectionObserver(entries => {
+          entries.forEach(e => { if (e.isIntersecting) canvas._previewStart?.(); else canvas._previewStop?.(); });
+        }, { threshold: 0.1 });
+        obs.observe(canvas);
+        canvas._previewStart?.();
+      } catch (_) {}
+    }
+  })();
 
   // ── Form handler ──
   window.handleStart = function(e) {

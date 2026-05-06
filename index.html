@@ -625,47 +625,15 @@
     </div>
   </section>
 
-  <!-- Demo Videos — Pre-rendered examples from ~/Developer/vyrl/output/ -->
-  <!-- To add more: drop .mp4 files in output/ and list them here -->
+  <!-- Demo Videos — Live canvas previews powered by the renderer -->
   <section class="demo-videos" id="demo">
     <div class="section-head">
       <span class="section-chips"><span class="chip chip-accent">Demo Reel</span></span>
       <h2>See AI UGC in action</h2>
-      <p class="section-sub">Actual pre-rendered influencer videos — playable right here.</p>
+      <p class="section-sub">Live animated previews — powered by the same engine that generates your content.</p>
     </div>
-    <div class="demo-grid">
-      <!-- cosylondon brand -->
-      <div class="demo-card">
-        <video src="output/cosylondon-grwm-shorts.mp4" poster="" controls playsinline preload="metadata"
-               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
-        <div class="demo-cap">CosyLondon · GRWM · Shorts</div>
-      </div>
-      <div class="demo-card">
-        <video src="output/cosylondon-mini-haul-reels.mp4" poster="" controls playsinline preload="metadata"
-               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
-        <div class="demo-cap">CosyLondon · Mini Haul · Reels</div>
-      </div>
-      <div class="demo-card">
-        <video src="output/cosylondon-honest-review-tiktok.mp4" poster="" controls playsinline preload="metadata"
-               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
-        <div class="demo-cap">CosyLondon · Honest Review · TikTok</div>
-      </div>
-      <!-- glowlab_club brand -->
-      <div class="demo-card">
-        <video src="output/glowlab_club-grwm-shorts.mp4" poster="" controls playsinline preload="metadata"
-               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
-        <div class="demo-cap">GlowLab · GRWM · Shorts</div>
-      </div>
-      <div class="demo-card">
-        <video src="output/glowlab_club-mini-haul-reels.mp4" poster="" controls playsinline preload="metadata"
-               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
-        <div class="demo-cap">GlowLab · Mini Haul · Reels</div>
-      </div>
-      <div class="demo-card">
-        <video src="output/glowlab_club-honest-review-tiktok.mp4" poster="" controls playsinline preload="metadata"
-               style="width:100%;aspect-ratio:9/16;background:#000;border-radius:12px;"></video>
-        <div class="demo-cap">GlowLab · Honest Review · TikTok</div>
-      </div>
+    <div class="demo-grid" id="demoGrid">
+      <!-- Populated by JS -->
     </div>
   </section>
 
@@ -773,7 +741,7 @@
         </div>
         <div class="gr-actions">
           <button class="btn-primary btn-pill" id="genAgain">Generate Another →</button>
-          <button class="btn-outline" onclick="document.getElementById('genOverlay').style.display='none'">Close</button>
+          <button class="btn-outline" id="genCloseResults">Close</button>
         </div>
       </div>
 
