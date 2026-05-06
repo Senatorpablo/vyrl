@@ -318,6 +318,12 @@ body { font-family:var(--font); line-height:1.6; overflow-x:hidden; }
 .gc-head { text-align:center; margin-bottom:20px; }
 .gc-head h3 { font-size:1.3rem; font-weight:800; margin:8px 0 4px; }
 .gc-sub { font-size:.85rem; color:var(--text-mid); }
+.gc-scan-result { display:flex; flex-direction:column; gap:3px; margin:8px 0 4px; min-height:34px; }
+.gc-scan-checking { font-size:.78rem; color:var(--text-light); font-style:italic; }
+.gc-scan-ok { font-size:.78rem; font-weight:700; color:#16A34A; }
+.gc-scan-warn { font-size:.78rem; font-weight:600; color:#D97706; }
+.gc-scan-info { font-size:.75rem; color:var(--text-mid); }
+.gc-scan-products { font-size:.72rem; color:var(--text-light); }
 .gc-opts { display:flex; flex-direction:column; gap:16px; }
 .gc-group label { display:block; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-light); margin-bottom:8px; }
 .gc-row { display:flex; flex-wrap:wrap; gap:8px; }
