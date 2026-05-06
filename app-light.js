@@ -55,17 +55,53 @@
     c.appendChild(d); gg.appendChild(c);
   });
 
-  // ── Hero + Blitz faces ──
-  [['maya','female'],['josh','male'],['priya','female']].forEach(([n,g],idx) => {
-    const el = document.querySelectorAll('.hps-face')[idx];
-    if (!el) return;
-    const f = RealFaces.getFace(n, g);
-    if (f) { const img = document.createElement('img'); img.src = f; img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;'; el.innerHTML = ''; el.appendChild(img); }
-  });
+  // ── Hero Carousel ──
+  (function buildHeroCarousel() {
+    const track = document.getElementById('hcTrack');
+    if (!track) return;
+    const faces = RealFaces.getGalleryFaces();
+    if (!faces || !faces.length) return;
+
+    const captions = [
+      '"Rate my glow up ✨ @glowlab_club"',
+      '"Got my order. Obsessed. 😍 @cosylondon"',
+      '"GRWM + honest review 🎀 @vyrl"',
+      '"This changed my routine 🙌 @fitfueluk"',
+      '"Honest take — worth every penny 💅 @glowlab"',
+      '"Day 7 update. Still obsessed. @vyrl"',
+    ];
+
+    // Build two copies for seamless loop
+    function makeCards() {
+      return faces.map((face, i) => {
+        const sizeClass = i % 5 === 2 ? 'hc-lg' : (i % 5 === 0 || i % 5 === 4) ? 'hc-sm' : 'hc-md';
+        const card = document.createElement('div');
+        card.className = `hc-card ${sizeClass}`;
+        const img = document.createElement('img');
+        img.src = face.faceData; img.alt = face.name; img.loading = 'lazy';
+        card.appendChild(img);
+        const lbl = document.createElement('div');
+        lbl.className = 'hc-label';
+        lbl.textContent = captions[i % captions.length];
+        card.appendChild(lbl);
+        return card;
+      });
+    }
+
+    makeCards().forEach(c => track.appendChild(c));
+    makeCards().forEach(c => track.appendChild(c)); // duplicate for loop
+  })();
+
+  // ── Blitz phone face ──
   const bpFace = document.querySelector('.bp-face');
   if (bpFace) {
-    const f = RealFaces.getFace('priya', 'female');
-    if (f) { const img = document.createElement('img'); img.src = f; img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;'; bpFace.innerHTML = ''; bpFace.appendChild(img); }
+    const faces = RealFaces.getGalleryFaces();
+    const pick = faces.find(f => f.gender === 'female') || faces[0];
+    if (pick) {
+      const img = document.createElement('img'); img.src = pick.faceData;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+      bpFace.innerHTML = ''; bpFace.appendChild(img);
+    }
   }
 
   // ── Blitz swipe ──

@@ -235,14 +235,31 @@ const VYRLRenderer = (() => {
     const ctx = canvas.getContext('2d');
 
     const stream = canvas.captureStream(FPS);
-    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-      ? 'video/webm;codecs=vp9' : 'video/webm;codecs=vp8';
+    const CODECS = [
+      'video/webm;codecs=vp9',
+      'video/webm;codecs=vp8',
+      'video/webm',
+      'video/mp4',
+    ];
+    const mime = CODECS.find(c => MediaRecorder.isTypeSupported(c)) || '';
+    const recOpts = mime ? { mimeType: mime, videoBitsPerSecond: 3_500_000 } : {};
     const chunks = [];
-    const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 3_500_000 });
+    const rec = new MediaRecorder(stream, recOpts);
     const done = new Promise(res => {
       rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-      rec.onstop = () => res(new Blob(chunks, { type: 'video/webm' }));
+      rec.onstop = () => res(new Blob(chunks, { type: mime || 'video/webm' }));
     });
+
+    // Draw frame 0 onto the canvas BEFORE calling captureStream —
+    // some Chrome versions refuse to capture a never-painted canvas.
+    const paint = (progress) => {
+      ctx.clearRect(0, 0, W, H);
+      drawBackground(ctx, progress, paletteIdx);
+      drawPortrait(ctx, faceImg, progress);
+      drawCaption(ctx, videoData.caption, progress);
+      drawUI(ctx, progress, videoData.platform, influencer.name, influencer.voice?.name || 'RP');
+    };
+    paint(0);
 
     rec.start();
     const t0 = performance.now();
@@ -252,16 +269,10 @@ const VYRLRenderer = (() => {
       const target = t0 + f * fd;
       const lag = target - performance.now();
       if (lag > 0) await new Promise(r => setTimeout(r, lag));
-
-      const progress = f / totalFrames;
-      ctx.clearRect(0, 0, W, H);
-      drawBackground(ctx, progress, paletteIdx);
-      drawPortrait(ctx, faceImg, progress);
-      drawCaption(ctx, videoData.caption, progress);
-      drawUI(ctx, progress, videoData.platform, influencer.name, influencer.voice?.name || 'RP');
+      paint(f / totalFrames);
     }
 
-    await new Promise(r => setTimeout(r, 150));
+    await new Promise(r => setTimeout(r, 200));
     rec.stop();
     const blob = await done;
 
