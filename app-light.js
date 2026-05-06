@@ -294,15 +294,54 @@
     document.getElementById('griBio').textContent = influencer.vibe;
     document.getElementById('griVoice').innerHTML = `🗣️ ${influencer.voice.name} — ${influencer.voice.style}`;
 
-    // Videos
+    // Videos — live canvas previews
     const vg = document.getElementById('grVideoGrid');
-    vg.innerHTML = videos.map(v => {
-      const h = v.url && !v.error;
-      return `<div class="gr-vid">${h
-        ? `<video src="${v.url}" poster="${v.poster || ''}" controls playsinline preload="metadata" style="width:100%;aspect-ratio:9/16;background:#000;border-radius:8px;"></video>`
-        : `<div style="width:100%;aspect-ratio:9/16;background:#111;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#666;font-size:.8em;padding:16px;text-align:center;">${v.caption ? v.caption.substring(0, 80) + '…' : 'Render skipped'}</div>`
-      }<div class="gr-vid-cap">${v.format} · ${v.platform}</div></div>`;
-    }).join('');
+    vg.innerHTML = '';
+
+    // Stop any previously running canvas animations
+    if (window._vyrlCanvasObserver) { window._vyrlCanvasObserver.disconnect(); }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const cv = entry.target;
+        if (entry.isIntersecting) { cv._previewStart?.(); }
+        else { cv._previewStop?.(); }
+      });
+    }, { threshold: 0.1 });
+    window._vyrlCanvasObserver = observer;
+
+    videos.forEach(v => {
+      const wrap = document.createElement('div');
+      wrap.className = 'gr-vid';
+
+      if (v.canvas) {
+        // Live animated canvas preview
+        wrap.appendChild(v.canvas);
+        observer.observe(v.canvas);
+
+        // Play/pause toggle on click
+        let playing = false;
+        v.canvas.style.cursor = 'pointer';
+        v.canvas.title = 'Click to play/pause';
+        v.canvas.addEventListener('click', () => {
+          if (playing) { v.canvas._previewStop?.(); playing = false; }
+          else { v.canvas._previewStart?.(); playing = true; }
+        });
+        // Auto-start when visible
+        v.canvas._previewStart?.();
+        playing = true;
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.style.cssText = 'width:100%;aspect-ratio:9/16;background:#111;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#666;font-size:.8em;padding:16px;text-align:center;';
+        placeholder.textContent = v.caption ? v.caption.substring(0, 80) + '…' : 'Preview unavailable';
+        wrap.appendChild(placeholder);
+      }
+
+      const cap = document.createElement('div');
+      cap.className = 'gr-vid-cap';
+      cap.textContent = `${v.format || 'Video'} · ${v.platform || 'TikTok'}`;
+      wrap.appendChild(cap);
+      vg.appendChild(wrap);
+    });
   }
 
   // ── Form handler ──
