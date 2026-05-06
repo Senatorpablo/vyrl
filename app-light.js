@@ -83,6 +83,6 @@
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ov.classList.contains('active')){ov.classList.remove('active');document.body.style.overflow='';}});
   document.getElementById('genAgain')?.addEventListener('click',()=>{ov.classList.remove('active');document.body.style.overflow='';document.getElementById('heroUrl').focus();});
 
-  window.handleStart=function(e){e.preventDefault();const input=document.getElementById('heroUrl')||document.getElementById('ctaUrl');const url=input.value.trim();if(!url){toast('⚠ Please enter your website domain');return false;}input.value='';runGen(url);return false;};
+  window.handleStart=function(e){e.preventDefault();const input=e.target.querySelector('input[type="text"]');const url=(input&&input.value.trim())||'';if(!url){toast('⚠ Please enter your website domain');return false;}input.value='';runGen(url);return false;};
 
 })();

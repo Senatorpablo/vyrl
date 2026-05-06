@@ -132,7 +132,7 @@ const VYRL = (() => {
   }
 
   function extractBrandName(domain) {
-    return domain.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return domain.replace(/(\.[a-z]{2,6})+$/i, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
   async function fetchPage(url) {
