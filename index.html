@@ -6,13 +6,13 @@
   <title>VYRL — Don't Find Influencers. Generate Them.</title>
   <meta name="description" content="Enter your website. VYRL creates a photorealistic AI brand ambassador, then fires off thousands of scroll-stopping UGC videos across every platform. No contracts, no waiting.">
   <meta name="theme-color" content="#FDF9F6">
-  <link rel="icon" type="image/svg+xml" href="assets/favicon-light.svg">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon-light.svg">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.svg">
   
   <meta property="og:type" content="website">
   <meta property="og:title" content="VYRL — Don't Find Influencers. Generate Them.">
   <meta property="og:description" content="Enter your website. Generate a photorealistic AI brand ambassador. Deploy thousands of UGC videos.">
-  <meta property="og:image" content="https://senatorpablo.github.io/vyrl/assets/og-image-light.svg">
+  <meta property="og:image" content="https://senatorpablo.github.io/vyrl/assets/og-image.svg">
   <meta property="og:locale" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
   
@@ -21,6 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles-light.css">
   <script src="assets/real-faces.js"></script>
+  <script src="procedural-faces.js"></script>
   <script src="generator.js"></script>
   <script src="renderer.js"></script>
 </head>
@@ -33,8 +34,9 @@
       <a href="#" class="nav-logo"><span class="logo-text">VYRL</span></a>
       <div class="nav-links">
         <a href="#how">How It Works</a>
-        <a href="#features">Features</a>
+        <a href="#formats">Formats</a>
         <a href="#gallery">Gallery</a>
+        <a href="#compare">Compare</a>
         <a href="#pricing">Pricing</a>
       </div>
       <a href="#start" class="nav-btn btn-primary">Get started free</a>
@@ -62,18 +64,9 @@
         <p class="hero-meta">No credit card required · 5-minute setup · ASA compliant</p>
       </div>
       <div class="hero-visual">
-        <div class="hero-phone-stack">
-          <div class="hps-card hps-1">
-            <div class="hps-face"></div>
-            <div class="hps-cap">"Rate my glow up ✨ @glowlab_club"</div>
-          </div>
-          <div class="hps-card hps-2">
-            <div class="hps-face"></div>
-            <div class="hps-cap">"Got my order. Obsessed. 😍"</div>
-          </div>
-          <div class="hps-card hps-3">
-            <div class="hps-face"></div>
-            <div class="hps-cap">"GRWM + honest review 🎀"</div>
+        <div class="hero-carousel" id="heroCarousel">
+          <div class="hc-track" id="hcTrack">
+            <!-- Populated by JS from RealFaces gallery -->
           </div>
         </div>
         <div class="hero-stats-pill">
@@ -86,6 +79,17 @@
       </div>
     </div>
   </section>
+
+  <!-- Trusted By -->
+  <div class="brands-strip">
+    <div class="brands-label">Trusted by UK brands including</div>
+    <div class="brands-track-wrap">
+      <div class="brands-track" aria-hidden="true">
+        <span>GlowLab London</span><span>CosyLondon</span><span>FitFuel UK</span><span>TechGear UK</span><span>Northern Threads</span><span>SocialProof Agency</span><span>HomeLab UK</span><span>StyleBrew</span><span>PureForm Nutrition</span><span>InkHouse</span><span>Boltyard</span><span>MintLeaf</span>
+        <span>GlowLab London</span><span>CosyLondon</span><span>FitFuel UK</span><span>TechGear UK</span><span>Northern Threads</span><span>SocialProof Agency</span><span>HomeLab UK</span><span>StyleBrew</span><span>PureForm Nutrition</span><span>InkHouse</span><span>Boltyard</span><span>MintLeaf</span>
+      </div>
+    </div>
+  </div>
 
   <!-- How It Works -->
   <section class="how" id="how">
@@ -156,6 +160,114 @@
     </div>
   </section>
 
+  <!-- Content Formats -->
+  <section class="formats" id="formats">
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">Content Studio</span></span>
+      <h2>Every format that stops the scroll</h2>
+      <p class="section-sub">VYRL generates six battle-tested video formats — each remixed from what's already going viral.</p>
+    </div>
+    <div class="formats-grid">
+      <div class="fmt-card fmt-ugc">
+        <div class="fmt-icon">🎬</div>
+        <h3>AI UGC Video</h3>
+        <p>Your influencer talks to camera — raw, authentic, unboxing energy. The format that dominates TikTok.</p>
+        <div class="fmt-tag">Most popular</div>
+      </div>
+      <div class="fmt-card fmt-slideshow">
+        <div class="fmt-icon">📱</div>
+        <h3>Slideshow</h3>
+        <p>Photo-style carousels with captions that demand a save. High completion rate on Reels.</p>
+      </div>
+      <div class="fmt-card fmt-hook">
+        <div class="fmt-icon">🎯</div>
+        <h3>Hook + Demo</h3>
+        <p>A scroll-stopping opener, then your product in action. Highest conversion format for e-commerce.</p>
+      </div>
+      <div class="fmt-card fmt-walloftext">
+        <div class="fmt-icon">💬</div>
+        <h3>Wall of Text</h3>
+        <p>Dense, opinionated, controversial. The format that gets comments and shares from an engaged audience.</p>
+      </div>
+      <div class="fmt-card fmt-greenscreen">
+        <div class="fmt-icon">🟩</div>
+        <h3>Green Screen</h3>
+        <p>Your influencer reacts to reviews, screenshots, or trending audio. Feels native to every platform.</p>
+      </div>
+      <div class="fmt-card fmt-remix">
+        <div class="fmt-icon">🔥</div>
+        <h3>Trending Remix</h3>
+        <p>VYRL scans what's going viral right now and clones the format for your brand — before it peaks.</p>
+        <div class="fmt-tag fmt-tag-new">New</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trending Now -->
+  <section class="trending" id="trending">
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">Trending Now</span></span>
+      <h2>Clone what's winning, right now</h2>
+      <p class="section-sub">VYRL monitors TikTok, Reels, and Shorts 24/7. When a format peaks, we clone it for your brand before the moment passes.</p>
+    </div>
+    <div class="trending-grid">
+      <div class="trend-card">
+        <div class="trend-badge trend-hot">🔥 Hot</div>
+        <div class="trend-format">GRWM</div>
+        <div class="trend-stats">
+          <span class="trend-views">4.2M views / week</span>
+          <span class="trend-growth trend-up">↑ 38%</span>
+        </div>
+        <p>Get-ready-with-me paired with product reveal. Highest watch time of any format right now.</p>
+      </div>
+      <div class="trend-card">
+        <div class="trend-badge trend-hot">🔥 Hot</div>
+        <div class="trend-format">Honest Review</div>
+        <div class="trend-stats">
+          <span class="trend-views">2.8M views / week</span>
+          <span class="trend-growth trend-up">↑ 21%</span>
+        </div>
+        <p>Unfiltered, first-person product takes. Audiences trust them more than polished ads.</p>
+      </div>
+      <div class="trend-card">
+        <div class="trend-badge trend-rising">📈 Rising</div>
+        <div class="trend-format">Trending Remix</div>
+        <div class="trend-stats">
+          <span class="trend-views">1.9M views / week</span>
+          <span class="trend-growth trend-up">↑ 62%</span>
+        </div>
+        <p>Your influencer takes a trending audio or meme and makes it about your product. Feels native. Converts.</p>
+      </div>
+      <div class="trend-card">
+        <div class="trend-badge trend-rising">📈 Rising</div>
+        <div class="trend-format">Hook + Demo</div>
+        <div class="trend-stats">
+          <span class="trend-views">1.4M views / week</span>
+          <span class="trend-growth trend-up">↑ 14%</span>
+        </div>
+        <p>Three-second pattern interrupt → product demo → CTA. The format with the highest click-through rate in beauty and tech.</p>
+      </div>
+      <div class="trend-card">
+        <div class="trend-badge trend-steady">→ Steady</div>
+        <div class="trend-format">Mini Haul</div>
+        <div class="trend-stats">
+          <span class="trend-views">3.1M views / week</span>
+          <span class="trend-growth trend-flat">↔ stable</span>
+        </div>
+        <p>Evergreen. Unboxing energy, product showcase, and genuine reaction in under 60 seconds.</p>
+      </div>
+      <div class="trend-card">
+        <div class="trend-badge trend-steady">→ Steady</div>
+        <div class="trend-format">Wall of Text</div>
+        <div class="trend-stats">
+          <span class="trend-views">890K views / week</span>
+          <span class="trend-growth trend-flat">↔ stable</span>
+        </div>
+        <p>Controversial takes and dense copy that make people stop and read. Drives comments and shares organically.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- Gallery -->
   <section class="gallery" id="gallery">
     <div class="section-head">
@@ -196,6 +308,134 @@
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Growth Profile -->
+  <section class="growthprofile" id="growth">
+    <div class="gp-inner">
+      <div class="gp-text">
+        <span class="section-chips"><span class="chip chip-accent">Growth Profile</span></span>
+        <h2>Your brand gets its own growth playbook</h2>
+        <p>Before generating a single frame, VYRL deep-dives your brand — products, audience, competitors, and voice. The result is a bespoke Growth Profile that powers every piece of content we make for you.</p>
+        <ul class="gp-list">
+          <li><strong>Brand DNA scan</strong> — tone, colour palette, product range, price point.</li>
+          <li><strong>Competitor mapping</strong> — we identify who you're up against and what's working for them.</li>
+          <li><strong>Audience insight</strong> — demographics, platform habits, peak engagement windows.</li>
+          <li><strong>Content roadmap</strong> — a prioritised backlog of formats and angles for your niche.</li>
+        </ul>
+        <a href="#start" class="btn-primary btn-pill">Build my Growth Profile →</a>
+      </div>
+      <div class="gp-visual">
+        <div class="gp-card">
+          <div class="gp-card-head">
+            <span class="gp-badge">✓ Growth Profile ready</span>
+            <strong>GlowLab London</strong>
+          </div>
+          <div class="gp-rows">
+            <div class="gp-row">
+              <span class="gp-label">Industry</span>
+              <span class="gp-val">Beauty & Skincare</span>
+            </div>
+            <div class="gp-row">
+              <span class="gp-label">Brand tone</span>
+              <span class="gp-val">Premium · Sustainable</span>
+            </div>
+            <div class="gp-row">
+              <span class="gp-label">Target audience</span>
+              <span class="gp-val">Women 22–34, UK</span>
+            </div>
+            <div class="gp-row">
+              <span class="gp-label">Top competitors</span>
+              <span class="gp-val">The Ordinary · Drunk Elephant</span>
+            </div>
+            <div class="gp-row">
+              <span class="gp-label">Best format</span>
+              <span class="gp-val">Honest Review · GRWM</span>
+            </div>
+            <div class="gp-row">
+              <span class="gp-label">Peak posting</span>
+              <span class="gp-val">Tue–Thu · 7–9pm GMT</span>
+            </div>
+          </div>
+          <div class="gp-formats">
+            <span>🎬 AI UGC</span>
+            <span>🎯 Hook + Demo</span>
+            <span>🔥 Trending Remix</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section class="compare" id="compare">
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">Why VYRL</span></span>
+      <h2>The numbers don't lie</h2>
+      <p class="section-sub">Compare VYRL against hiring a real influencer or using a generic AI tool.</p>
+    </div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="cth-real">Real Influencer</th>
+            <th class="cth-other">Other AI Tools</th>
+            <th class="cth-vyrl"><span class="vyrl-tag">VYRL</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cf">Monthly cost</td>
+            <td>£2k – £15k</td>
+            <td>£99 – £499</td>
+            <td class="cv"><strong>From £49</strong></td>
+          </tr>
+          <tr>
+            <td class="cf">Setup time</td>
+            <td>2–6 weeks</td>
+            <td>1–2 hours</td>
+            <td class="cv"><strong>5 minutes</strong></td>
+          </tr>
+          <tr>
+            <td class="cf">Content formats</td>
+            <td>1–2</td>
+            <td>2–3</td>
+            <td class="cv"><strong>6 formats</strong></td>
+          </tr>
+          <tr>
+            <td class="cf">UK regional accents</td>
+            <td class="cx">✗</td>
+            <td class="cx">✗</td>
+            <td class="cv">✓ 11 accents</td>
+          </tr>
+          <tr>
+            <td class="cf">You own the influencer</td>
+            <td class="cx">✗ Never</td>
+            <td class="cx">✗ Shared pool</td>
+            <td class="cv">✓ 100% yours</td>
+          </tr>
+          <tr>
+            <td class="cf">ASA compliant</td>
+            <td>Manual only</td>
+            <td class="cx">✗</td>
+            <td class="cv">✓ Built-in</td>
+          </tr>
+          <tr>
+            <td class="cf">Growth Profile</td>
+            <td class="cx">✗</td>
+            <td class="cx">✗</td>
+            <td class="cv">✓ Included</td>
+          </tr>
+          <tr>
+            <td class="cf">Scale</td>
+            <td>1 creator</td>
+            <td>Limited credits</td>
+            <td class="cv"><strong>Unlimited</strong></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
@@ -296,6 +536,67 @@
     </div>
   </section>
 
+  <!-- Publish & Schedule -->
+  <section class="publish" id="publish">
+    <div class="section-head">
+      <span class="section-chips"><span class="chip chip-accent">Publish & Schedule</span></span>
+      <h2>One tap to every platform</h2>
+      <p class="section-sub">Approve a video in Blitz Mode. VYRL auto-schedules it for peak time across every platform you're connected to.</p>
+    </div>
+    <div class="pub-platforms">
+      <div class="pub-plat">
+        <div class="pub-logo pub-tiktok">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.73a8.27 8.27 0 004.84 1.55V6.84a4.85 4.85 0 01-1.07-.15z"/></svg>
+        </div>
+        <strong>TikTok</strong>
+        <span>Auto-post at peak hours</span>
+      </div>
+      <div class="pub-plat">
+        <div class="pub-logo pub-ig">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </div>
+        <strong>Instagram Reels</strong>
+        <span>Stories + Reels in one</span>
+      </div>
+      <div class="pub-plat">
+        <div class="pub-logo pub-yt">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </div>
+        <strong>YouTube Shorts</strong>
+        <span>Shorts built-in natively</span>
+      </div>
+    </div>
+    <div class="pub-calendar">
+      <div class="pub-cal-head">
+        <span class="pub-cal-title">Content Calendar — May 2026</span>
+        <span class="pub-cal-sub">12 videos scheduled · 3 platforms</span>
+      </div>
+      <div class="pub-cal-grid">
+        <div class="pcg-row pcg-head">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+        <div class="pcg-row">
+          <div class="pcg-cell"></div>
+          <div class="pcg-cell pcg-filled pcg-tiktok">GRWM<br><small>TikTok · 7pm</small></div>
+          <div class="pcg-cell"></div>
+          <div class="pcg-cell pcg-filled pcg-ig">Haul<br><small>Reels · 6pm</small></div>
+          <div class="pcg-cell pcg-filled pcg-yt">Review<br><small>Shorts · 8pm</small></div>
+          <div class="pcg-cell"></div>
+          <div class="pcg-cell pcg-filled pcg-tiktok">Remix<br><small>TikTok · 5pm</small></div>
+        </div>
+        <div class="pcg-row">
+          <div class="pcg-cell pcg-filled pcg-ig">GRWM<br><small>Reels · 7pm</small></div>
+          <div class="pcg-cell pcg-filled pcg-tiktok">Demo<br><small>TikTok · 8pm</small></div>
+          <div class="pcg-cell"></div>
+          <div class="pcg-cell pcg-filled pcg-yt">Haul<br><small>Shorts · 7pm</small></div>
+          <div class="pcg-cell"></div>
+          <div class="pcg-cell pcg-filled pcg-tiktok">Review<br><small>TikTok · 6pm</small></div>
+          <div class="pcg-cell"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- FAQ -->
   <section class="faq" id="faq">
     <div class="section-head">
@@ -385,17 +686,76 @@
   <!-- Gen Overlay -->
   <div class="gen-overlay" id="genOverlay">
     <div class="gen-modal">
-      <div class="gen-phase" id="genPhaseProgress">
+
+      <!-- Phase 0: Customise -->
+      <div class="gen-phase" id="genPhaseCustomise">
+        <button class="gen-close" id="genCloseCustomise">×</button>
+        <div class="gc-head">
+          <span class="gr-badge">🔍 Brand detected</span>
+          <h3 id="gcBrandName">Your Brand</h3>
+          <p class="gc-sub">Customise your AI influencer before we generate.</p>
+        </div>
+        <div class="gc-opts">
+          <div class="gc-group">
+            <label>Gender</label>
+            <div class="gc-row" data-opt="gender">
+              <button class="gc-btn active" data-val="female">Female</button>
+              <button class="gc-btn" data-val="male">Male</button>
+              <button class="gc-btn" data-val="any">Any</button>
+            </div>
+          </div>
+          <div class="gc-group">
+            <label>Age range</label>
+            <div class="gc-row" data-opt="age">
+              <button class="gc-btn active" data-val="any">Any</button>
+              <button class="gc-btn" data-val="18-24">18–24</button>
+              <button class="gc-btn" data-val="25-34">25–34</button>
+              <button class="gc-btn" data-val="35+">35+</button>
+            </div>
+          </div>
+          <div class="gc-group">
+            <label>Style</label>
+            <div class="gc-row" data-opt="style">
+              <button class="gc-btn active" data-val="any">Any</button>
+              <button class="gc-btn" data-val="clean">Clean & Minimal</button>
+              <button class="gc-btn" data-val="bold">Bold & Trendy</button>
+              <button class="gc-btn" data-val="raw">Authentic & Raw</button>
+            </div>
+          </div>
+          <div class="gc-group">
+            <label>Voice accent</label>
+            <div class="gc-row gc-row-voices" data-opt="voice">
+              <button class="gc-btn active" data-val="any">Any UK</button>
+              <button class="gc-btn" data-val="rp">RP London</button>
+              <button class="gc-btn" data-val="scouse">Scouse</button>
+              <button class="gc-btn" data-val="manc">Mancunian</button>
+              <button class="gc-btn" data-val="yorks">Yorkshire</button>
+              <button class="gc-btn" data-val="scottish">Scottish</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary btn-pill gc-go" id="genGoBtn">Generate My Influencer →</button>
+      </div>
+
+      <!-- Phase 1: Progress -->
+      <div class="gen-phase" id="genPhaseProgress" style="display:none">
         <div class="gen-spinner"></div>
         <h3 id="genStatus">Analysing your brand...</h3>
         <div class="gen-bar"><div class="gen-bar-fill" id="genBarFill"></div></div>
         <div class="gen-steps" id="genStepList"></div>
       </div>
+
+      <!-- Phase 2: Results -->
       <div class="gen-phase" id="genPhaseResults" style="display:none">
         <button class="gen-close" id="genClose">×</button>
         <div class="gr-header">
           <span class="gr-badge">✓ Generated</span>
           <h2 id="grBrandName">Brand</h2>
+        </div>
+        <!-- Growth Profile -->
+        <div class="gr-profile" id="grProfile">
+          <div class="grp-label">Growth Profile</div>
+          <div class="gr-analysis" id="grAnalysis"></div>
         </div>
         <div class="gr-influencer">
           <div class="gri-avatar" id="griAvatar"></div>
@@ -406,7 +766,6 @@
             <span class="gri-voice" id="griVoice">Voice</span>
           </div>
         </div>
-        <div class="gr-analysis" id="grAnalysis"></div>
         <!-- Video gallery -->
         <div class="gr-videos">
           <h3>Your AI UGC Videos</h3>
@@ -417,6 +776,7 @@
           <button class="btn-outline" onclick="document.getElementById('genOverlay').style.display='none'">Close</button>
         </div>
       </div>
+
     </div>
   </div>
 

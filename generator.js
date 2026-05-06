@@ -132,7 +132,7 @@ const VYRL = (() => {
   }
 
   function extractBrandName(domain) {
-    return domain.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    return domain.replace(/(\.[a-z]{2,6})+$/i, '').replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
   async function fetchPage(url) {
@@ -239,22 +239,42 @@ const VYRL = (() => {
     return sorted.slice(0, 2).map(([t]) => t);
   }
 
-  function generateInfluencerProfile(brandInfo) {
+  function generateInfluencerProfile(brandInfo, preferences) {
     const { industry, brandName, domain, tones } = brandInfo;
-    
-    const archetypes = ARCHETYPES[industry] || ARCHETYPES._default;
+    const prefs = preferences || {};
+
+    let archetypes = ARCHETYPES[industry] || ARCHETYPES._default;
+
+    // Filter by preferred gender
+    if (prefs.gender && prefs.gender !== 'any') {
+      const filtered = archetypes.filter(a => a.gender === prefs.gender);
+      if (filtered.length) archetypes = filtered;
+    }
+
+    // Filter by age range
+    if (prefs.age && prefs.age !== 'any') {
+      const [lo, hi] = prefs.age === '35+' ? [35, 99] : prefs.age.split('-').map(Number);
+      const filtered = archetypes.filter(a => a.age >= lo && a.age <= hi);
+      if (filtered.length) archetypes = filtered;
+    }
+
     const archetype = archetypes[Math.floor(Math.random() * archetypes.length)];
-    
-    // Pick a voice that matches the brand's vibe
-    const voice = VOICES[Math.floor(Math.random() * VOICES.length)];
-    
+
+    // Pick voice — honour preference if set
+    let voice;
+    if (prefs.voice && prefs.voice !== 'any') {
+      voice = VOICES.find(v => v.id === prefs.voice) || VOICES[Math.floor(Math.random() * VOICES.length)];
+    } else {
+      voice = VOICES[Math.floor(Math.random() * VOICES.length)];
+    }
+
     return {
       name: archetype.name,
       age: archetype.age,
       gender: archetype.gender,
       style: archetype.style,
       vibe: archetype.vibe,
-      voice: voice,
+      voice,
       personaStatement: `${archetype.name} is a ${archetype.age}-year-old ${archetype.vibe} based in ${voice.region}. They speak with a ${voice.name} accent that brings ${voice.style} energy to every video.`,
       brandFit: `${archetype.name} is the perfect ambassador for ${brandName} because their ${tones.join(' and ')} approach aligns naturally with the brand's identity.`,
     };
@@ -311,7 +331,7 @@ const VYRL = (() => {
   }
 
   // ── Main generation pipeline ──
-  async function generate(url) {
+  async function generate(url, preferences) {
     const normalizedUrl = normalizeUrl(url);
     const domain = extractDomain(normalizedUrl);
     const brandName = extractBrandName(domain);
@@ -356,9 +376,9 @@ const VYRL = (() => {
       parsed,
     };
 
-    const influencer = generateInfluencerProfile(brandInfo);
+    const influencer = generateInfluencerProfile(brandInfo, preferences);
     const videos = generateVideoScripts(brandInfo, influencer);
-    const colors = parsed ? getBrandColorsFromSite(parsed) : { primary: '#7C3AED', accent: '#06B6D4' };
+    const colors = (parsed && parsed.colorMatches) ? getBrandColorsFromSite(parsed) : { primary: '#7C3AED', accent: '#06B6D4' };
 
     return {
       brand: brandInfo,

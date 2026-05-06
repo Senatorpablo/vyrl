@@ -1,131 +1,281 @@
 /* ═══════════════════════════════════════════
-   VYRL — renderer.js (v3 — procedural faces)
-   Composites procedural face portraits onto backgrounds
-   Zero external image dependencies — always works
+   VYRL — renderer.js (v5 — live canvas animation, no MediaRecorder)
+   Works on file://, localhost, any origin.
+   Each preview is a <canvas> running a rAF loop.
    ═══════════════════════════════════════════ */
 
 const VYRLRenderer = (() => {
   'use strict';
-  const W = 720, H = 1280, FPS = 24, DUR = 8;
 
-  function drawBg(ctx, progress, paletteIdx) {
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    const p = [
-      ['#2d1b69', '#16213e'], ['#1a0a2e', '#0d1b2a'],
-      ['#0f2027', '#203a43'], ['#3a1c71', '#0f0c29'],
-      ['#1a0525', '#0a1628'], ['#200a0a', '#0a0a20'],
-      ['#0a1a1a', '#1a1505'], ['#0a0a20', '#1a0525'],
-    ][paletteIdx % 8];
-    grad.addColorStop(0, p[0]); grad.addColorStop(1, p[1]);
-    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+  const W = 405, H = 720, FPS = 30, DUR = 8;
 
-    // Floating particles
-    for (let i = 0; i < 15; i++) {
-      const px = (150 + Math.sin(progress * 3 + i * 1.7) * 300 + i * 45) % W;
-      const py = (200 + Math.cos(progress * 2.5 + i * 1.3) * 400 + i * 50) % H;
-      ctx.fillStyle = `rgba(255,255,255,${0.02 + Math.sin(progress * 4 + i) * 0.01})`;
-      ctx.beginPath(); ctx.arc(px, py, 2 + i * 0.2, 0, Math.PI * 2); ctx.fill();
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      if (!src) { reject(new Error('no src')); return; }
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('load failed'));
+      img.src = src;
+    });
+  }
+
+  function pickFaceDataUrl(influencer) {
+    if (typeof RealFaces === 'undefined') return null;
+    const gallery = RealFaces.getGalleryFaces();
+    if (!gallery || !gallery.length) return null;
+    const byName = gallery.find(f => f.name.toLowerCase() === influencer.name.toLowerCase());
+    if (byName && byName.faceData) return byName.faceData;
+    const gender = influencer.gender || 'female';
+    const byGender = gallery.filter(f => f.gender === gender);
+    if (byGender.length) return byGender[Math.floor(Math.random() * byGender.length)].faceData;
+    return gallery[0].faceData;
+  }
+
+  function drawBackground(ctx, progress, paletteIdx) {
+    const palettes = [
+      ['#140820', '#0a1020'], ['#0e1f26', '#0a1628'],
+      ['#1a0d28', '#0d0a1e'], ['#0a1a10', '#101a0a'],
+      ['#200a10', '#0a1020'], ['#0a0a20', '#200a18'],
+      ['#101420', '#0a1820'], ['#1e0a14', '#140a1e'],
+    ];
+    const [c1, c2] = palettes[paletteIdx % palettes.length];
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, c1); bg.addColorStop(1, c2);
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    for (let i = 0; i < 14; i++) {
+      const px = ((Math.sin(progress * 2.8 + i * 1.9) * 0.5 + 0.5) * W + i * 44) % W;
+      const py = ((Math.cos(progress * 2.1 + i * 1.4) * 0.5 + 0.5) * H + i * 70) % H;
+      const a  = Math.max(0, 0.025 + Math.sin(progress * 5 + i) * 0.012);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.beginPath(); ctx.arc(px, py, 1.2 + i * 0.12, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawPortrait(ctx, faceImg, progress) {
+    if (!faceImg) {
+      // Placeholder gradient silhouette when no image available
+      const grad = ctx.createLinearGradient(0, 0, W, H * 0.68);
+      grad.addColorStop(0, 'rgba(80,60,120,0.6)');
+      grad.addColorStop(1, 'rgba(40,30,60,0.6)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H * 0.68);
+    } else {
+      const zoom   = 1 + Math.sin(progress * Math.PI) * 0.03;
+      const driftX = Math.sin(progress * Math.PI * 1.1) * 8;
+      const driftY = Math.cos(progress * Math.PI * 0.85) * 5
+                   + Math.sin(progress * Math.PI * 2) * 2.5;
+
+      const faceAreaH = H * 0.68;
+
+      ctx.save();
+      ctx.translate(W / 2 + driftX, faceAreaH / 2 + driftY);
+      ctx.scale(zoom, zoom);
+
+      const iW = faceImg.naturalWidth  || faceImg.width  || 512;
+      const iH = faceImg.naturalHeight || faceImg.height || 512;
+      const iAspect = iW / iH;
+      const tAspect = W  / faceAreaH;
+
+      let sw, sh, sx, sy;
+      if (iAspect > tAspect) {
+        sh = iH; sw = iH * tAspect;
+        sx = (iW - sw) / 2; sy = 0;
+      } else {
+        sw = iW; sh = iW / tAspect;
+        sx = 0; sy = (iH - sh) / 4;
+      }
+      ctx.drawImage(faceImg, sx, sy, sw, sh, -W / 2, -faceAreaH / 2, W, faceAreaH);
+      ctx.restore();
+
+      // Talking glow
+      const driftX2 = Math.sin(progress * Math.PI * 1.1) * 8;
+      const driftY2 = Math.cos(progress * Math.PI * 0.85) * 5 + Math.sin(progress * Math.PI * 2) * 2.5;
+      const mouthY  = H * 0.68 * 0.62 + driftY2;
+      const mouthX  = W / 2 + driftX2 * 0.4;
+      const talkAmp = Math.abs(Math.sin(progress * Math.PI * 9 * DUR));
+      if (talkAmp > 0.25) {
+        const glow = ctx.createRadialGradient(mouthX, mouthY, 0, mouthX, mouthY, 40);
+        glow.addColorStop(0,   `rgba(255,210,160,${talkAmp * 0.15})`);
+        glow.addColorStop(0.5, `rgba(255,180,100,${talkAmp * 0.07})`);
+        glow.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(mouthX - 55, mouthY - 22, 110, 44);
+      }
+
+      // Blink
+      const blinkCycle = (progress * DUR) % 3.5;
+      if (blinkCycle < 0.12) {
+        const blinkAlpha = Math.sin((blinkCycle / 0.12) * Math.PI) * 0.45;
+        const eyeY = H * 0.68 * 0.38 + driftY2;
+        ctx.fillStyle = `rgba(0,0,0,${blinkAlpha})`;
+        ctx.fillRect(W / 2 - 60, eyeY - 10, 120, 20);
+      }
     }
 
-    // Vignette
-    const vg = ctx.createRadialGradient(W/2, H/2, W*0.3, W/2, H/2, W*0.65);
-    vg.addColorStop(0, 'transparent'); vg.addColorStop(1, 'rgba(0,0,0,0.5)');
-    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+    // Bottom fade gradient
+    const fade = ctx.createLinearGradient(0, H * 0.68 * 0.38, 0, H);
+    fade.addColorStop(0, 'rgba(0,0,0,0)');
+    fade.addColorStop(0.35, 'rgba(0,0,0,0.55)');
+    fade.addColorStop(0.65, 'rgba(0,0,0,0.82)');
+    fade.addColorStop(1, 'rgba(0,0,0,0.95)');
+    ctx.fillStyle = fade; ctx.fillRect(0, 0, W, H);
   }
 
-  function drawFaceCircle(ctx, faceCanvas, progress) {
-    const cx = W / 2, cy = H * 0.26, radius = 155;
-    const floatY = Math.sin(progress * Math.PI * 2.5) * 3;
-    const tilt = Math.sin(progress * Math.PI * 3.1) * 0.02;
+  function drawCaption(ctx, caption, progress) {
+    const reveal = Math.min(progress / 0.72, 1);
+    const words  = caption.split(' ');
+    const shown  = Math.round(words.length * reveal);
+    const text   = words.slice(0, shown).join(' ');
 
-    ctx.save();
-    ctx.translate(cx, cy + floatY);
-    ctx.rotate(tilt);
+    ctx.font = '700 20px "Geist","Inter",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
 
-    // Glow
-    ctx.shadowColor = 'rgba(255,100,150,0.3)'; ctx.shadowBlur = 35;
-    ctx.beginPath(); ctx.arc(0, 0, radius + 5, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 2; ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    // Clip circle
-    ctx.beginPath(); ctx.arc(0, 0, radius, 0, Math.PI * 2); ctx.clip();
-    ctx.drawImage(faceCanvas, -radius, -radius * 0.15, radius * 2, radius * 2.3);
-    ctx.restore();
-  }
-
-  function drawCaptions(ctx, caption, progress) {
-    const rp = Math.min(progress * 2.2, 1);
-    const words = caption.split(' '); let cc = 0, wi = 0;
-    for (let i = 0; i < words.length; i++) { cc += words[i].length + 1; if (cc > caption.length * rp) { wi = i; break; } wi = i + 1; }
-    const vw = words.slice(0, wi);
-
-    ctx.font = '700 38px/1.3 "Geist", "Inter", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     const lines = []; let cur = '';
-    for (const w of vw) { const t = cur ? cur + ' ' + w : w; if (ctx.measureText(t).width > W - 80 && cur) { lines.push(cur); cur = w; } else cur = t; }
+    for (const w of text.split(' ')) {
+      const trial = cur ? cur + ' ' + w : w;
+      if (ctx.measureText(trial).width > W - 48 && cur) {
+        lines.push(cur); cur = w;
+      } else cur = trial;
+    }
     if (cur) lines.push(cur);
 
-    const sy = H * 0.74;
-    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 14;
-    lines.forEach((l, i) => { ctx.fillStyle = '#F4F4F5'; ctx.fillText(l, W/2, sy + i * 52); });
+    const startY = H * 0.74;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.9)'; ctx.shadowBlur = 14;
+    lines.forEach((l, i) => {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(l, W / 2, startY + i * 28);
+    });
     ctx.restore();
   }
 
   function drawUI(ctx, progress, platform, influencerName, voiceAccent) {
-    // Right sidebar
-    const sx = W - 36, by = H * 0.68;
-    ctx.beginPath(); ctx.arc(sx, by, 22, 0, Math.PI*2); ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=2;ctx.stroke();
-    ctx.fillStyle='#fff'; ctx.font='bold 14px "Geist",sans-serif'; ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(influencerName[0],sx,by);
-    ['♥','💬','↗','☆'].forEach((b,i)=>{ const y=by+50+i*48; ctx.beginPath();ctx.arc(sx,y,22,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fill();ctx.fillStyle='rgba(255,255,255,0.5)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(b,sx,y); });
+    const railX = W - 22;
+    const baseY = H * 0.60;
 
-    // Bottom left
-    ctx.font='700 16px "Geist",sans-serif'; ctx.textAlign='left'; ctx.fillStyle='#fff'; ctx.shadowColor='rgba(0,0,0,0.5)'; ctx.shadowBlur=4;
-    ctx.fillText(`@${influencerName.toLowerCase()} • ${voiceAccent}`, 20, H - 70); ctx.shadowBlur=0;
+    // Avatar circle
+    ctx.beginPath(); ctx.arc(railX, baseY, 14, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.font = 'bold 9px "Geist",sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText((influencerName[0] || '?').toUpperCase(), railX, baseY);
 
-    // Top right, watermark, progress bar
-    ctx.font='600 13px "Geist",sans-serif'; ctx.textAlign='right'; ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fillText(platform, W-20, 40);
-    ctx.font='600 12px "Geist",sans-serif'; ctx.fillStyle='rgba(255,255,255,0.1)'; ctx.fillText('VYRL', W-20, H-18);
-    ctx.beginPath(); ctx.rect(16, H-10, W-32, 4); ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fill();
-    ctx.beginPath(); ctx.rect(16, H-10, (W-32)*progress, 4); ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.fill();
+    // Action buttons
+    ['♥','💬','↗','☆'].forEach((icon, i) => {
+      const y = baseY + 32 + i * 32;
+      ctx.beginPath(); ctx.arc(railX, y, 13, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255,255,255,0.07)'; ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(icon, railX, y);
+    });
+
+    // Handle + accent (bottom-left)
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 6;
+    ctx.font = '700 11px "Geist",sans-serif'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`@${influencerName.toLowerCase()}`, 12, H - 58);
+    ctx.font = '400 9px "Geist",sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillText(voiceAccent, 12, H - 46);
+    ctx.restore();
+
+    // Platform badge
+    ctx.font = '600 9px "Geist",sans-serif'; ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillText(platform, W - 12, 24);
+
+    // VYRL watermark
+    ctx.font = '600 8px "Geist",sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.fillText('VYRL', W - 12, H - 8);
+
+    // Progress stripe
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(0, H - 3, W, 3);
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillRect(0, H - 3, W * progress, 3);
   }
 
-  async function renderVideo(influencer, videoData, paletteIdx) {
-    const faceCanvas = VYRLFaces.renderFace(influencer.name, influencer.gender || 'female', 320);
-    const totalFrames = Math.ceil(DUR * FPS);
-    const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
+  /* ── Create a live animated canvas preview ── */
+  async function renderPreview(influencer, videoData, paletteIdx) {
+    // Load face image
+    const faceDataUrl = pickFaceDataUrl(influencer);
+    let faceImg = null;
+    if (faceDataUrl) {
+      try { faceImg = await loadImage(faceDataUrl); } catch (_) {}
+    }
+    if (!faceImg && typeof VYRLFaces !== 'undefined') {
+      try { faceImg = VYRLFaces.renderFace(influencer.name, influencer.gender || 'female', 512); } catch (_) {}
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width  = W;
+    canvas.height = H;
+    canvas.style.cssText = 'width:100%;aspect-ratio:9/16;display:block;border-radius:10px;background:#111;';
+
     const ctx = canvas.getContext('2d');
-    const stream = canvas.captureStream(FPS);
-    const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm;codecs=vp8';
-    const chunks = []; const rec = new MediaRecorder(stream, { mime, videoBitsPerSecond: 3000000 });
-    const done = new Promise(r => { rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); }; rec.onstop = () => r(new Blob(chunks, { type: 'video/webm' })); });
-    rec.start(); const st = performance.now(); const fd = 1000 / FPS;
+    const voiceAccent = influencer.voice?.name || 'RP';
+    let startTime = null;
+    let rafId = null;
+    let running = false;
 
-    for (let f = 0; f < totalFrames; f++) {
-      const tt = st + f * fd, nw = performance.now(); if (nw < tt) await new Promise(r => setTimeout(r, tt - nw));
+    function paint(progress) {
       ctx.clearRect(0, 0, W, H);
-      drawBg(ctx, f / totalFrames, paletteIdx);
-      drawFaceCircle(ctx, faceCanvas, f / totalFrames);
-      drawCaptions(ctx, videoData.caption, f / totalFrames);
-      drawUI(ctx, f / totalFrames, videoData.platform, influencer.name, influencer.voice?.name || 'RP');
+      drawBackground(ctx, progress, paletteIdx);
+      drawPortrait(ctx, faceImg, progress);
+      drawCaption(ctx, videoData.caption || 'Generated content', progress);
+      drawUI(ctx, progress, videoData.platform || 'TikTok', influencer.name, voiceAccent);
     }
 
-    await new Promise(r => setTimeout(r, 100)); rec.stop();
-    const blob = await done;
-    // Poster
-    ctx.clearRect(0, 0, W, H); drawBg(ctx, 0, paletteIdx); drawFaceCircle(ctx, faceCanvas, 0);
-    drawCaptions(ctx, videoData.caption, 0.05); drawUI(ctx, 0, videoData.platform, influencer.name, 'RP');
-    return { blob, poster: canvas.toDataURL('image/jpeg', 0.85), url: URL.createObjectURL(blob), width: W, height: H, duration: DUR };
+    function loop(ts) {
+      if (!running) return;
+      if (!startTime) startTime = ts;
+      const elapsed = (ts - startTime) / 1000;
+      const progress = (elapsed % DUR) / DUR;
+      paint(progress);
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function start() {
+      if (running) return;
+      running = true;
+      startTime = null;
+      rafId = requestAnimationFrame(loop);
+    }
+
+    function stop() {
+      running = false;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    }
+
+    // Draw first frame immediately so canvas isn't blank
+    paint(0.08);
+
+    // Attach start/stop to canvas for IntersectionObserver
+    canvas._previewStart = start;
+    canvas._previewStop  = stop;
+
+    return canvas;
   }
 
+  /* ── Batch render (returns live canvases) ── */
   async function renderBatch(influencer, videoDatas, onProgress) {
-    const res = [];
+    const results = [];
     for (let i = 0; i < videoDatas.length; i++) {
-      onProgress?.(i, videoDatas.length, `Rendering video ${i+1}/${videoDatas.length}...`);
-      try { const r = await renderVideo(influencer, videoDatas[i], i); res.push({ ...videoDatas[i], ...r }); }
-      catch (e) { console.error(e); res.push({ ...videoDatas[i], error: e.message }); }
+      onProgress?.(i, videoDatas.length, `Preparing preview ${i + 1} / ${videoDatas.length}…`);
+      try {
+        const canvas = await renderPreview(influencer, videoDatas[i], i);
+        results.push({ ...videoDatas[i], canvas });
+      } catch (err) {
+        console.error('Preview error:', err);
+        results.push({ ...videoDatas[i], error: err.message });
+      }
     }
-    return res;
+    return results;
   }
 
-  return { renderVideo, renderBatch, WIDTH: W, HEIGHT: H, DURATION_SEC: DUR, FPS };
+  return { renderPreview, renderBatch, WIDTH: W, HEIGHT: H, DURATION_SEC: DUR, FPS };
 })();
