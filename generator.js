@@ -389,9 +389,28 @@ const VYRL = (() => {
     };
   }
 
+  // ── Quick brand scan (used for pre-check in customise phase) ──
+  async function scanBrand(url) {
+    const normalizedUrl = normalizeUrl(url);
+    const domain = extractDomain(normalizedUrl);
+    try {
+      const html = await fetchPage(normalizedUrl);
+      const parsed = parseHTML(html);
+      const industry = detectIndustry(parsed, domain);
+      const tones = analyzeTone(parsed);
+      const siteTitle = parsed.title?.slice(0, 60) || '';
+      const products = parsed.productNames.slice(0, 3);
+      return { ok: true, domain, siteTitle, industry, tones, products, productCount: parsed.productNames.length };
+    } catch (_) {
+      const industry = detectIndustry({ title: '', description: '', h1s: [], bodyText: '' }, domain);
+      return { ok: false, domain, industry, siteTitle: '', products: [], productCount: 0 };
+    }
+  }
+
   // ── Public API ──
   return {
     generate,
+    scanBrand,
     VOICES,
     VIDEO_FORMATS,
     ARCHETYPES,

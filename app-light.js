@@ -348,19 +348,54 @@
   window.handleStart = function(e) {
     e.preventDefault();
     const input = e.target.querySelector('input[type="text"]');
-    const url = (input && input.value.trim()) || '';
-    if (!url) { toast('⚠ Please enter your website domain'); return false; }
+    const raw = (input && input.value.trim()) || '';
+    if (!raw) { toast('⚠ Please enter your website domain'); return false; }
+
+    // Basic validation — must look like a domain
+    const cleaned = raw.replace(/^https?:\/\//i, '').replace(/^www\./i, '').trim();
+    if (!cleaned.includes('.') || cleaned.includes(' ')) {
+      toast('⚠ Please enter a valid website — e.g. glossier.com'); return false;
+    }
+
     input.value = '';
+    const domain = cleaned.split('/')[0];
+    const brandSlug = domain.replace(/(\.[a-z]{2,6})+$/i, '').split('.').pop();
+    const displayName = brandSlug.charAt(0).toUpperCase() + brandSlug.slice(1);
 
-    // Show customise phase first
-    const brandName = url.replace(/^https?:\/\//i, '').replace(/^www\./i, '').split('/')[0].split('.')[0];
-    const gcBrand = document.getElementById('gcBrandName');
-    if (gcBrand) gcBrand.textContent = brandName.charAt(0).toUpperCase() + brandName.slice(1);
+    document.getElementById('gcBrandName').textContent = displayName;
+    document.getElementById('gcBadge').textContent = '🔍 Scanning brand…';
+    const scanEl = document.getElementById('gcScanResult');
+    if (scanEl) scanEl.innerHTML = `<span class="gc-scan-checking">Checking ${domain}…</span>`;
 
-    pendingUrl = url;
+    pendingUrl = raw;
     showPhase(p0);
     ov.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Background pre-scan — updates the panel while user picks options
+    VYRL.scanBrand(raw).then(scan => {
+      if (!ov.classList.contains('active')) return; // modal closed
+      document.getElementById('gcBadge').textContent = scan.ok ? '✓ Brand read' : '⚠ Domain analysis';
+      if (scanEl) {
+        const industryLabel = scan.industry.charAt(0).toUpperCase() + scan.industry.slice(1);
+        if (scan.ok) {
+          const productsLine = scan.products.length
+            ? `<span class="gc-scan-products">Products found: ${scan.products.slice(0,3).join(', ')}</span>`
+            : '';
+          scanEl.innerHTML =
+            `<span class="gc-scan-ok">✓ Successfully read ${scan.domain}</span>` +
+            `<span class="gc-scan-info">Detected industry: ${industryLabel}${scan.siteTitle ? ' · ' + scan.siteTitle.slice(0,50) : ''}</span>` +
+            productsLine;
+        } else {
+          scanEl.innerHTML =
+            `<span class="gc-scan-warn">⚠ Couldn't reach ${scan.domain} — using domain analysis</span>` +
+            `<span class="gc-scan-info">Estimated industry: ${industryLabel}. Results will be less tailored.</span>`;
+        }
+      }
+    }).catch(() => {
+      if (scanEl) scanEl.innerHTML = `<span class="gc-scan-warn">⚠ Could not reach site — using domain analysis</span>`;
+    });
+
     return false;
   };
 
