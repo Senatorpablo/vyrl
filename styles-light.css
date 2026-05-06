@@ -103,6 +103,10 @@ body { font-family:var(--font); line-height:1.6; overflow-x:hidden; }
 .step-card:hover { box-shadow:var(--shadow-md); transform:translateY(-4px); }
 .step-num { position:absolute; top:20px; right:24px; font-size:3rem; font-weight:900; color:var(--orange-ghost); line-height:1; }
 .step-img { width:48px; height:48px; margin-bottom:20px; border-radius:var(--radius-md); background:var(--orange-ghost); display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
+.si { font-style:normal; }
+.si-website::before { content:'🌐'; }
+.si-influencer::before { content:'🤖'; }
+.si-deploy::before { content:'🚀'; }
 .step-card h3 { font-size:1.15rem; font-weight:700; margin-bottom:8px; color:var(--black); }
 .step-card p { font-size:.9rem; color:var(--text-mid); line-height:1.6; }
 
@@ -259,6 +263,65 @@ body { font-family:var(--font); line-height:1.6; overflow-x:hidden; }
 .demo-card video { display:block; width:100%; object-fit:cover; }
 .demo-cap { padding:12px 16px; font-size:.85rem; font-weight:600; color:var(--text-mid); text-align:center; }
 
+/* ── Brands Strip ── */
+.brands-strip { padding:24px 0; border-top:1px solid var(--border-subtle); border-bottom:1px solid var(--border-subtle); background:var(--white); overflow:hidden; }
+.brands-label { text-align:center; font-size:.75rem; font-weight:600; color:var(--text-light); text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px; }
+.brands-track-wrap { overflow:hidden; }
+.brands-track { display:flex; gap:48px; white-space:nowrap; animation:marquee 28s linear infinite; width:max-content; }
+.brands-track span { font-size:.88rem; font-weight:700; color:var(--text-mid); }
+@keyframes marquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+
+/* ── Trending Now ── */
+.trending { padding:120px 32px; max-width:1280px; margin:0 auto; }
+.trending-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+.trend-card { background:var(--white); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:28px; position:relative; transition:box-shadow .3s, transform .3s; }
+.trend-card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
+.trend-badge { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:var(--radius-pill); font-size:.7rem; font-weight:700; margin-bottom:12px; }
+.trend-hot { background:rgba(239,68,68,.08); color:#DC2626; }
+.trend-rising { background:rgba(34,197,94,.08); color:#16A34A; }
+.trend-steady { background:rgba(100,116,139,.08); color:#64748B; }
+.trend-format { font-size:1.1rem; font-weight:800; color:var(--black); margin-bottom:8px; }
+.trend-stats { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.trend-views { font-size:.8rem; color:var(--text-light); }
+.trend-growth { font-size:.8rem; font-weight:700; }
+.trend-up { color:#16A34A; }
+.trend-flat { color:#64748B; }
+.trend-card>p { font-size:.87rem; color:var(--text-mid); line-height:1.6; }
+
+/* ── Comparison ── */
+.compare { padding:120px 32px; max-width:1280px; margin:0 auto; }
+.compare-wrap { overflow-x:auto; }
+.compare-table { width:100%; border-collapse:collapse; border-radius:var(--radius-xl); overflow:hidden; box-shadow:var(--shadow-md); }
+.compare-table thead th { padding:18px 24px; font-size:.8rem; font-weight:700; text-align:center; }
+.compare-table thead th:first-child { text-align:left; background:var(--cream); }
+.cth-real { background:#F8FAFC; color:var(--text-mid); }
+.cth-other { background:#F8FAFC; color:var(--text-mid); }
+.cth-vyrl { background:var(--orange); color:#fff; }
+.vyrl-tag { display:inline-block; }
+.compare-table tbody tr { border-top:1px solid var(--border-subtle); }
+.compare-table tbody tr:nth-child(even) td { background:var(--cream); }
+.compare-table td { padding:14px 24px; font-size:.88rem; color:var(--text-mid); text-align:center; }
+.compare-table td:first-child { text-align:left; font-weight:600; color:var(--text); background:var(--white); }
+.compare-table tr:nth-child(even) td:first-child { background:var(--cream); }
+.cv { color:var(--orange) !important; font-weight:700 !important; }
+.cx { color:var(--text-light) !important; }
+
+/* ── Customisation step in gen modal ── */
+.gc-head { text-align:center; margin-bottom:20px; }
+.gc-head h3 { font-size:1.3rem; font-weight:800; margin:8px 0 4px; }
+.gc-sub { font-size:.85rem; color:var(--text-mid); }
+.gc-opts { display:flex; flex-direction:column; gap:16px; }
+.gc-group label { display:block; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-light); margin-bottom:8px; }
+.gc-row { display:flex; flex-wrap:wrap; gap:8px; }
+.gc-btn { padding:8px 16px; border:1.5px solid var(--border); border-radius:var(--radius-pill); background:var(--white); font-family:var(--font); font-size:.82rem; font-weight:600; color:var(--text-mid); cursor:pointer; transition:all .2s; }
+.gc-btn:hover { border-color:var(--orange); color:var(--orange); }
+.gc-btn.active { border-color:var(--orange); background:var(--orange-ghost); color:var(--orange); }
+.gc-go { width:100%; justify-content:center; margin-top:20px; }
+
+/* ── Growth Profile in results ── */
+.gr-profile { margin-bottom:16px; }
+.grp-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-light); margin-bottom:8px; }
+
 /* ── Content Formats ── */
 .formats { padding:120px 32px; max-width:1280px; margin:0 auto; }
 .formats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
@@ -328,8 +391,9 @@ body { font-family:var(--font); line-height:1.6; overflow-x:hidden; }
   .input-wrap .btn-primary { width:100%; justify-content:center; border-radius:var(--radius-pill); }
   .nav-links { display:none; }
   .hamburger { display:flex; }
-  .how, .features, .formats, .gallery, .blitz, .growthprofile, .publish, .pricing, .testimonials, .faq, .cta { padding:80px 20px; }
-  .steps-row, .features-grid, .formats-grid { grid-template-columns:1fr; }
+  .how, .features, .formats, .trending, .gallery, .blitz, .growthprofile, .publish, .compare, .pricing, .testimonials, .faq, .cta { padding:80px 20px; }
+  .steps-row, .features-grid, .formats-grid, .trending-grid { grid-template-columns:1fr; }
+  .compare-table td, .compare-table th { padding:12px 14px; font-size:.8rem; }
   .gp-inner { grid-template-columns:1fr; gap:40px; }
   .pub-plat { padding:20px 28px; }
   .gallery-grid { grid-template-columns:repeat(2,1fr); }
