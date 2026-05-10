@@ -30,38 +30,65 @@ const VYRL = (() => {
   ];
 
   // ── Industry → Influencer Archetypes ──
+  // Hash a string to a stable integer — used to pick different archetypes per brand
+  function hashStr(s) {
+    let h = 0;
+    for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+
   const ARCHETYPES = {
     'beauty': [
-      { age: 24, gender: 'female', name: 'Maya', style: 'Clean Girl Aesthetic', vibe: 'soft-spoken, ingredient-obsessed skincare guru' },
-      { age: 27, gender: 'female', name: 'Zara', style: 'Bold Glam', vibe: 'confident, trend-setting makeup artist' },
+      { age: 22, gender: 'female', name: 'Maya',    style: 'Clean Girl Aesthetic',  vibe: 'soft-spoken, ingredient-obsessed skincare guru' },
+      { age: 27, gender: 'female', name: 'Zara',    style: 'Bold Glam',              vibe: 'confident, trend-setting makeup artist' },
+      { age: 25, gender: 'female', name: 'Aaliya',  style: 'Dewy Natural',           vibe: 'fresh-faced, honest product reviewer' },
+      { age: 30, gender: 'female', name: 'Simone',  style: 'Luxury Skincare',        vibe: 'premium beauty aficionado, rituals-focused' },
+      { age: 24, gender: 'male',   name: 'River',   style: 'Gender-Fluid Beauty',    vibe: 'boundary-breaking, expressive beauty creator' },
     ],
     'fashion': [
-      { age: 25, gender: 'female', name: 'Priya', style: 'Street Style', vibe: 'effortlessly cool, trend-aware fashion enthusiast' },
-      { age: 29, gender: 'male', name: 'Kai', style: 'Minimalist', vibe: 'sharp, fashion-forward city professional' },
+      { age: 25, gender: 'female', name: 'Priya',   style: 'Street Style',           vibe: 'effortlessly cool, trend-aware fashion enthusiast' },
+      { age: 29, gender: 'male',   name: 'Kai',     style: 'Minimalist',             vibe: 'sharp, fashion-forward city professional' },
+      { age: 22, gender: 'female', name: 'Nia',     style: 'Y2K Revival',            vibe: 'bold, nostalgic, trend-obsessed creator' },
+      { age: 31, gender: 'male',   name: 'Marcus',  style: 'Streetwear',             vibe: 'hype-aware, culture-driven style commentator' },
+      { age: 27, gender: 'female', name: 'Freya',   style: 'Slow Fashion',           vibe: 'considered, ethical fashion advocate' },
     ],
     'fitness': [
-      { age: 28, gender: 'male', name: 'Josh', style: 'Athletic', vibe: 'high-energy, motivational fitness coach' },
-      { age: 26, gender: 'female', name: 'Tara', style: 'Wellness', vibe: 'holistic health advocate, yoga instructor' },
+      { age: 28, gender: 'male',   name: 'Josh',    style: 'Athletic',               vibe: 'high-energy, motivational fitness coach' },
+      { age: 26, gender: 'female', name: 'Tara',    style: 'Wellness',               vibe: 'holistic health advocate, yoga instructor' },
+      { age: 30, gender: 'male',   name: 'Devon',   style: 'Bodybuilding',           vibe: 'disciplined, gains-focused strength coach' },
+      { age: 24, gender: 'female', name: 'Cass',    style: 'Running & Cardio',       vibe: 'relatable marathon runner, honest about struggle' },
+      { age: 32, gender: 'male',   name: 'Remi',    style: 'Functional Fitness',     vibe: 'practical, science-backed fitness educator' },
     ],
     'tech': [
-      { age: 32, gender: 'male', name: 'Leo', style: 'Tech Reviewer', vibe: 'sharp, analytical gadget reviewer' },
-      { age: 28, gender: 'female', name: 'Ada', style: 'Productivity Creator', vibe: 'smart, relatable tech tips creator' },
+      { age: 32, gender: 'male',   name: 'Leo',     style: 'Tech Reviewer',          vibe: 'sharp, analytical gadget reviewer' },
+      { age: 28, gender: 'female', name: 'Ada',     style: 'Productivity Creator',   vibe: 'smart, relatable tech tips creator' },
+      { age: 26, gender: 'male',   name: 'Jax',     style: 'Gaming & Streaming',     vibe: 'hype-driven, community-first gaming creator' },
+      { age: 30, gender: 'female', name: 'Vera',    style: 'AI & Future Tech',       vibe: 'forward-thinking, accessible tech explainer' },
+      { age: 35, gender: 'male',   name: 'Olu',     style: 'Startup Founder',        vibe: 'entrepreneurial, no-BS product thinker' },
     ],
     'food': [
-      { age: 30, gender: 'female', name: 'Ella', style: 'Home Cook', vibe: 'passionate home chef, recipe creator' },
-      { age: 27, gender: 'male', name: 'Tom', style: 'Foodie Explorer', vibe: 'adventurous eater, honest reviewer' },
+      { age: 30, gender: 'female', name: 'Ella',    style: 'Home Cook',              vibe: 'passionate home chef, recipe creator' },
+      { age: 27, gender: 'male',   name: 'Tom',     style: 'Foodie Explorer',        vibe: 'adventurous eater, honest reviewer' },
+      { age: 25, gender: 'female', name: 'Bex',     style: 'Plant-Based',            vibe: 'vibrant vegan food creator, makes it accessible' },
+      { age: 33, gender: 'male',   name: 'Seb',     style: 'Restaurant Critic',      vibe: 'discerning, opinionated dining guide' },
     ],
     'home': [
-      { age: 31, gender: 'female', name: 'Sophie', style: 'Home Décor', vibe: 'cosy home stylist, DIY enthusiast' },
-      { age: 34, gender: 'male', name: 'Dan', style: 'DIY Pro', vibe: 'practical, no-nonsense renovation expert' },
+      { age: 31, gender: 'female', name: 'Sophie',  style: 'Home Décor',             vibe: 'cosy home stylist, DIY enthusiast' },
+      { age: 34, gender: 'male',   name: 'Dan',     style: 'DIY Pro',                vibe: 'practical, no-nonsense renovation expert' },
+      { age: 28, gender: 'female', name: 'Isla',    style: 'Maximalist Interiors',   vibe: 'bold colour lover, eclectic home curator' },
+      { age: 36, gender: 'male',   name: 'Greg',    style: 'Minimalist Living',      vibe: 'calm, curated home simplification coach' },
     ],
     'travel': [
-      { age: 26, gender: 'female', name: 'Luna', style: 'Solo Traveller', vibe: 'adventurous budget traveller' },
-      { age: 30, gender: 'male', name: 'Oscar', style: 'Luxury Explorer', vibe: 'discerning, experience-seeking traveller' },
+      { age: 26, gender: 'female', name: 'Luna',    style: 'Solo Traveller',         vibe: 'adventurous budget traveller' },
+      { age: 30, gender: 'male',   name: 'Oscar',   style: 'Luxury Explorer',        vibe: 'discerning, experience-seeking traveller' },
+      { age: 24, gender: 'female', name: 'Mia',     style: 'Van Life',               vibe: 'free-spirited, off-grid adventure creator' },
+      { age: 29, gender: 'male',   name: 'Finn',    style: 'Cultural Traveller',     vibe: 'history-curious, local-experience seeker' },
     ],
     '_default': [
-      { age: 27, gender: 'female', name: 'Amelia', style: 'Lifestyle Creator', vibe: 'versatile, charismatic brand storyteller' },
-      { age: 31, gender: 'male', name: 'Jack', style: 'Product Reviewer', vibe: 'trustworthy, detailed product advocate' },
+      { age: 27, gender: 'female', name: 'Amelia',  style: 'Lifestyle Creator',      vibe: 'versatile, charismatic brand storyteller' },
+      { age: 31, gender: 'male',   name: 'Jack',    style: 'Product Reviewer',       vibe: 'trustworthy, detailed product advocate' },
+      { age: 24, gender: 'female', name: 'Zoe',     style: 'Day-in-My-Life',         vibe: 'authentic, relatable everyday content creator' },
+      { age: 33, gender: 'male',   name: 'Nate',    style: 'Educator',               vibe: 'clear, helpful explainer of complex topics' },
     ],
   };
 
@@ -258,7 +285,8 @@ const VYRL = (() => {
       if (filtered.length) archetypes = filtered;
     }
 
-    const archetype = archetypes[Math.floor(Math.random() * archetypes.length)];
+    // Use brand domain hash for deterministic-but-varied selection per brand
+    const archetype = archetypes[hashStr(domain) % archetypes.length];
 
     // Pick voice — honour preference if set
     let voice;

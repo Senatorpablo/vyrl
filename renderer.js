@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   VYRL — renderer.js (v6 — crisp DPR canvas, visible face motion)
+   VYRL — renderer.js (v7 — human motion, DPR-crisp)
    ═══════════════════════════════════════════ */
 
 const VYRLRenderer = (() => {
@@ -50,90 +50,96 @@ const VYRLRenderer = (() => {
     }
   }
 
-  /* ── Portrait with visible Ken Burns + head motion ── */
+  /* ── Portrait: human-like motion ── */
   function drawPortrait(ctx, faceImg, progress) {
-    const faceAreaH = H * 0.70;
+    const faceAreaH = H * 0.72;
 
     if (!faceImg) {
-      const grad = ctx.createLinearGradient(0, 0, W, faceAreaH);
-      grad.addColorStop(0, 'rgba(80,60,120,0.6)');
-      grad.addColorStop(1, 'rgba(40,30,60,0.6)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, W, faceAreaH);
+      const g = ctx.createLinearGradient(0,0,W,faceAreaH);
+      g.addColorStop(0,'rgba(80,60,120,0.6)'); g.addColorStop(1,'rgba(40,30,60,0.6)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,faceAreaH);
     } else {
-      // ── Visible motion: large enough to see ──
-      const t = progress;
+      const sec = progress * DUR; // 0..8 absolute seconds
 
-      // Ken Burns zoom: 1.0 → 1.14 over 8s (clearly visible)
-      const zoom = 1 + Math.sin(t * Math.PI) * 0.07;
+      // Slow Ken Burns zoom (1.0 → 1.12 → 1.0)
+      const zoom = 1 + Math.sin(progress * Math.PI) * 0.06;
 
-      // Slow lateral sway — head moves left/right
-      const driftX = Math.sin(t * Math.PI * 0.9) * 22;
+      // Natural lateral sway
+      const swayX = Math.sin(sec * 0.55) * 16 + Math.sin(sec * 1.3) * 6;
 
-      // Slow vertical drift (looking down then up)
-      const driftY = Math.cos(t * Math.PI * 0.7) * 14;
+      // Vertical drift
+      const swayY = Math.cos(sec * 0.45) * 10 + Math.cos(sec * 1.1) * 4;
 
-      // Head-bob: 1.5 cycles over 8s — like natural talking movement
-      const headBob = Math.sin(t * Math.PI * 2 * 1.5 * DUR / DUR) * 10;
+      // Head-bob at talking pace (~1.8 Hz)
+      const talkBob = Math.sin(sec * Math.PI * 1.8) * 8;
 
-      // Speaking micro-bounce: fast small bounce while talking (3 Hz)
-      const speakBounce = Math.abs(Math.sin(t * Math.PI * 3 * DUR / DUR)) * 5;
+      // Micro-nod at emphasis points (~3.5 Hz)
+      const microNod = Math.abs(Math.sin(sec * Math.PI * 3.5)) * 3;
 
-      // Total vertical offset
-      const totalY = driftY + headBob + speakBounce;
+      const tx = swayX;
+      const ty = swayY + talkBob + microNod;
 
-      // Slight head tilt (rotate)
-      const tilt = Math.sin(t * Math.PI * 1.1) * 0.018; // ~1° max
+      // Subtle head tilt (±1.2° in sync with sway)
+      const tilt = Math.sin(sec * 0.55) * 0.021;
 
       ctx.save();
-      ctx.translate(W / 2 + driftX, faceAreaH / 2 + totalY);
+      ctx.translate(W/2 + tx, faceAreaH/2 + ty);
       ctx.rotate(tilt);
       ctx.scale(zoom, zoom);
 
       const iW = faceImg.naturalWidth  || faceImg.width  || 512;
       const iH = faceImg.naturalHeight || faceImg.height || 512;
-      const iAspect = iW / iH;
-      const tAspect = W  / faceAreaH;
-
-      let sw, sh, sx, sy;
-      if (iAspect > tAspect) {
-        sh = iH; sw = iH * tAspect; sx = (iW - sw) / 2; sy = 0;
-      } else {
-        sw = iW; sh = iW / tAspect; sx = 0; sy = (iH - sh) / 4;
-      }
-      ctx.drawImage(faceImg, sx, sy, sw, sh, -W / 2, -faceAreaH / 2, W, faceAreaH);
+      const iA = iW/iH, tA = W/faceAreaH;
+      let sw,sh,sx,sy;
+      if (iA>tA) { sh=iH; sw=iH*tA; sx=(iW-sw)/2; sy=0; }
+      else       { sw=iW; sh=iW/tA; sx=0; sy=(iH-sh)/4; }
+      ctx.drawImage(faceImg, sx,sy,sw,sh, -W/2,-faceAreaH/2, W,faceAreaH);
       ctx.restore();
 
-      // ── Talking glow at mouth area ──
-      const mouthY = faceAreaH * 0.60 + totalY;
-      const mouthX = W / 2 + driftX * 0.3;
-      // Fast flicker at ~8 Hz (speech rate)
-      const talkPhase = Math.sin(t * Math.PI * 8 * DUR / DUR);
-      const talkAmp   = Math.abs(talkPhase) * 0.5 + 0.2; // always some glow, pulses
-      const glow = ctx.createRadialGradient(mouthX, mouthY, 0, mouthX, mouthY, 55);
-      glow.addColorStop(0,   `rgba(255,220,160,${talkAmp * 0.22})`);
-      glow.addColorStop(0.5, `rgba(255,170, 80,${talkAmp * 0.10})`);
+      // ── Mouth open/close animation ──
+      const mouthY = faceAreaH * 0.60 + ty;
+      const mouthX = W/2 + tx * 0.35;
+
+      // Lip movement: 4 Hz word rate, abs gives open/close shape
+      const lipPhase = Math.sin(sec * Math.PI * 4);
+      const lipOpen  = Math.abs(lipPhase) * 0.7 + 0.1; // 0.1–0.8
+
+      // Dark ellipse simulates open mouth
+      const lipH = lipOpen * 10;
+      ctx.save();
+      ctx.globalAlpha = lipOpen * 0.55;
+      ctx.fillStyle = 'rgba(20,10,5,1)';
+      ctx.beginPath();
+      ctx.ellipse(mouthX, mouthY + 3, 18, lipH, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.restore();
+
+      // Warm talking glow (pulses with lip movement)
+      const glowAmp = 0.18 + lipOpen * 0.14;
+      const glow = ctx.createRadialGradient(mouthX,mouthY,0, mouthX,mouthY,60);
+      glow.addColorStop(0,   `rgba(255,200,140,${glowAmp})`);
+      glow.addColorStop(0.5, `rgba(255,160, 80,${glowAmp*0.45})`);
       glow.addColorStop(1,   'rgba(0,0,0,0)');
-      ctx.fillStyle = glow;
-      ctx.fillRect(mouthX - 70, mouthY - 30, 140, 60);
+      ctx.fillStyle=glow; ctx.fillRect(mouthX-80,mouthY-40,160,80);
 
       // ── Blink every 3.5 s ──
-      const blinkCycle = (t * DUR) % 3.5;
-      if (blinkCycle < 0.13) {
-        const eyeY = faceAreaH * 0.37 + totalY;
-        const ba   = Math.sin((blinkCycle / 0.13) * Math.PI) * 0.85; // solid blink
-        ctx.fillStyle = `rgba(0,0,0,${ba})`;
-        ctx.fillRect(W / 2 - 75, eyeY - 13, 150, 26);
+      const blinkT = sec % 3.5;
+      if (blinkT < 0.14) {
+        const eyeY = faceAreaH * 0.38 + ty;
+        const ba = Math.sin((blinkT/0.14)*Math.PI) * 0.9;
+        ctx.fillStyle=`rgba(0,0,0,${ba})`;
+        ctx.fillRect(W/2-80, eyeY-14, 160, 28);
       }
     }
 
     // Bottom fade
-    const fade = ctx.createLinearGradient(0, H * 0.35, 0, H);
+    const fade = ctx.createLinearGradient(0, H*0.32, 0, H);
     fade.addColorStop(0,    'rgba(0,0,0,0)');
-    fade.addColorStop(0.38, 'rgba(0,0,0,0.52)');
-    fade.addColorStop(0.65, 'rgba(0,0,0,0.80)');
-    fade.addColorStop(1,    'rgba(0,0,0,0.96)');
-    ctx.fillStyle = fade; ctx.fillRect(0, 0, W, H);
+    fade.addColorStop(0.38, 'rgba(0,0,0,0.50)');
+    fade.addColorStop(0.65, 'rgba(0,0,0,0.82)');
+    fade.addColorStop(1,    'rgba(0,0,0,0.97)');
+    ctx.fillStyle=fade; ctx.fillRect(0,0,W,H);
   }
 
   /* ── Typewriter caption ── */

@@ -62,34 +62,54 @@
     const faces = RealFaces.getGalleryFaces();
     if (!faces || !faces.length) return;
 
-    const captions = [
-      '"Rate my glow up ✨ @glowlab_club"',
-      '"Got my order. Obsessed. 😍 @cosylondon"',
-      '"GRWM + honest review 🎀 @vyrl"',
-      '"This changed my routine 🙌 @fitfueluk"',
-      '"Honest take — worth every penny 💅 @glowlab"',
-      '"Day 7 update. Still obsessed. @vyrl"',
+    const cards_meta = [
+      { caption: 'Rate my glow up ✨ this routine changed EVERYTHING', handle: '@maya.vytrl', platform: 'TikTok', likes: '142K', comments: '3.2K' },
+      { caption: 'Got my order. Genuinely obsessed 😍 worth every penny', handle: '@priya.content', platform: 'Reels', likes: '89K', comments: '1.8K' },
+      { caption: 'GRWM + honest review 🎀 not sponsored, just actually love it', handle: '@zara.ugc', platform: 'TikTok', likes: '210K', comments: '5.1K' },
+      { caption: 'This changed my daily routine 🙌 fitfueluk has me locked in', handle: '@josh.fit', platform: 'Shorts', likes: '67K', comments: '924' },
+      { caption: 'Honest take after 30 days — it is actually worth it 💅', handle: '@aaliya.vyrl', platform: 'TikTok', likes: '183K', comments: '4.4K' },
+      { caption: 'Day 7 update and I am still obsessed. Not going back 🔥', handle: '@marcus.uk', platform: 'Reels', likes: '95K', comments: '2.1K' },
     ];
 
-    // Build two copies for seamless loop
+    const platforms = { TikTok: '#010101', Reels: '#C13584', Shorts: '#FF0000' };
+
     function makeCards() {
       return faces.map((face, i) => {
         const sizeClass = i % 5 === 2 ? 'hc-lg' : (i % 5 === 0 || i % 5 === 4) ? 'hc-sm' : 'hc-md';
+        const meta = cards_meta[i % cards_meta.length];
         const card = document.createElement('div');
         card.className = `hc-card ${sizeClass}`;
+
+        // Main face image
         const img = document.createElement('img');
         img.src = face.faceData; img.alt = face.name; img.loading = 'lazy';
         card.appendChild(img);
-        const lbl = document.createElement('div');
-        lbl.className = 'hc-label';
-        lbl.textContent = captions[i % captions.length];
+
+        // Dark overlay
+        const ov = document.createElement('div'); ov.className = 'hc-overlay'; card.appendChild(ov);
+
+        // Platform badge
+        const plt = document.createElement('div'); plt.className = 'hc-platform';
+        plt.textContent = meta.platform; card.appendChild(plt);
+
+        // Right rail (likes + comments) — only on md/lg
+        if (sizeClass !== 'hc-sm') {
+          const rail = document.createElement('div'); rail.className = 'hc-rail';
+          rail.innerHTML = `<div class="hc-rail-btn"><span class="icon">♥</span><span>${meta.likes}</span></div><div class="hc-rail-btn"><span class="icon">💬</span><span>${meta.comments}</span></div>`;
+          card.appendChild(rail);
+        }
+
+        // Caption label
+        const lbl = document.createElement('div'); lbl.className = 'hc-label';
+        lbl.innerHTML = `<div class="hc-name">${meta.handle} <span class="hc-tick">✓</span></div><div class="hc-caption">${meta.caption}</div>`;
         card.appendChild(lbl);
+
         return card;
       });
     }
 
     makeCards().forEach(c => track.appendChild(c));
-    makeCards().forEach(c => track.appendChild(c)); // duplicate for loop
+    makeCards().forEach(c => track.appendChild(c));
   })();
 
   // ── Blitz phone face ──
